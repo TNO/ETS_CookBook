@@ -1,0 +1,17 @@
+.gitignore
+LICENCE
+LICENSE
+MOPO_logo_main.svg
+README.md
+eu-emblem-low-res.jpg
+pyproject.toml
+requirements.txt
+dist/ets_cookbook-1.0.3-py3-none-any.whl
+dist/ets_cookbook-1.0.3.tar.gz
+src/ETS_CookBook/ETS_CookBook.py
+src/ETS_CookBook/__init__.py
+src/ETS_CookBook.egg-info/PKG-INFO
+src/ETS_CookBook.egg-info/SOURCES.txt
+src/ETS_CookBook.egg-info/dependency_links.txt
+src/ETS_CookBook.egg-info/requires.txt
+src/ETS_CookBook.egg-info/top_level.txt
