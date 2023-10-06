@@ -33,6 +33,17 @@ You can do this with the following command:
 pip install -r requirements.txt
 ``
 
+To use the CookBook, import it as such:
+``
+from ETS_CookBook import ETS_CookBook as cook
+``
+Then you can call your functions as such:
+``
+cook.reference_scale([0.26, 0.89])
+``
+
+(You can replace the as cook with something else, or even skip it altogether:
+if you do skip it, then call the functions with ETS_CookBook.function).
 
 ## Licence
 
