@@ -1,0 +1,31 @@
+[build-system]
+requires = ['hatchling']
+build-backend = 'hatchling.build'
+
+# [tool.hatch.build]
+# include = [
+
+# ]
+# exclude = [
+# ]
+
+[project]
+name = 'ETS_CookBook'
+version = '1.0'
+authors = [
+  { name='Omar Usmani', email='Omar.Usmani@TNO.nl' },
+]
+description = 'The ETS (TNO) CookBook of useful Python Scripts'
+readme = 'README.md'
+requires-python = '>=3.11'
+classifiers = [
+    'Programming Language :: Python :: 3',
+    'License :: OSI Approved :: Apache Software License',
+    'Operating System :: OS Independent',
+]
+dynamic = ["dependencies"]
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[project.urls]
+'Homepage' = 'https://github.com/TNO/ETS_CookBook'
