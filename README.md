@@ -118,6 +118,8 @@ This function takes a grib file and converts it to a DataFrame.
     a different value for each row), then you need to iterate over the rows.
 26. **update_database_table:** Returns a query filter stringthat can be used
 in an SQL query.
+27. **read_table_from_database:** Returns a table from a database
+in an SQL query.
 
 ## Acknowledgements
 This CookBook has been developed within multiple projects,

@@ -52,6 +52,7 @@ This function takes a grib file and converts it to a DataFrame.
     If you want to change multiple rows (with
     a different value for each row), then you need to iterate over the rows.
 26. **update_database_table:** Returns a query filter stringthat can be used
+27. **read_table_from_database:** Returns a table from a database
 in an SQL query.
 '''
 
@@ -1028,6 +1029,22 @@ def make_query_filter(
             )
 
     return query_filter
+
+
+def read_table_from_database(table_name, database_file):
+    '''
+    Reads a table from an sqlite3 database and retruns it as a
+    dataframe
+    '''
+    with sqlite3.connect(database_file) as sql_connection:
+
+        table_query = read_query_generator(
+            '*', f'"{table_name}"', [], [], []
+        )
+
+        table_to_read = pd.read_sql(table_query, sql_connection)
+
+    return table_to_read
 
 
 if __name__ == '__main__':
