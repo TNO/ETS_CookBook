@@ -61,6 +61,7 @@ import datetime
 import math
 import sqlite3
 import zipfile
+
 try:
     import tomllib
 except ModuleNotFoundError:
@@ -115,10 +116,11 @@ def reference_scale(number_list: 'list[float]', digit_shift: int = 0):
 
     number_list_boundaries = [min(number_list), max(number_list)]
     boundary_powers_of_ten = [
-        int(math.log10(number))-digit_shift
+        int(math.log10(number)) - digit_shift
         # The first term gives us the power of ten of the highest digit,
         # which we shift with the digit_shift parameter
-        for number in number_list_boundaries]
+        for number in number_list_boundaries
+    ]
 
     dividers = [math.pow(10, power) for power in boundary_powers_of_ten]
 
@@ -126,15 +128,15 @@ def reference_scale(number_list: 'list[float]', digit_shift: int = 0):
         lower_scale = 0
     else:
         lower_scale = (
-            math.floor((number_list_boundaries[0])/dividers[0])
-            * dividers[0])
+            math.floor((number_list_boundaries[0]) / dividers[0]) * dividers[0]
+        )
 
     if dividers[1] == 0:
         upper_scale = 0
     else:
         upper_scale = (
-            math.ceil((number_list_boundaries[1])/dividers[1])
-            * dividers[1])
+            math.ceil((number_list_boundaries[1]) / dividers[1]) * dividers[1]
+        )
 
     return [lower_scale, upper_scale]
 
@@ -171,7 +173,8 @@ def dataframe_from_Excel_table_name(table_name, Excel_file):
     table_dictionary = {}
     for header_index, header in enumerate(table_headers):
         values_for_header = [
-            table_row[header_index] for table_row in table_values]
+            table_row[header_index] for table_row in table_values
+        ]
         table_dictionary[header] = values_for_header
 
     table_dataframe = pd.DataFrame.from_dict(table_dictionary)
@@ -191,12 +194,9 @@ def dataframe_to_Excel(dataframe_to_append, Excel_workbook, my_sheet):
         new_workbook.save(Excel_workbook)
 
     with pd.ExcelWriter(
-            Excel_workbook, mode='a', engine='openpyxl',
-            if_sheet_exists='replace') as writer:
-
-        dataframe_to_append.to_excel(
-            writer, sheet_name=my_sheet
-        )
+        Excel_workbook, mode='a', engine='openpyxl', if_sheet_exists='replace'
+    ) as writer:
+        dataframe_to_append.to_excel(writer, sheet_name=my_sheet)
 
 
 def get_extra_colors(parameters):
@@ -212,7 +212,7 @@ def get_extra_colors(parameters):
     extra_colors = pd.DataFrame(columns=['R', 'G', 'B'])
     for color in colors:
         extra_colors.loc[color] = colors[color]
-    extra_colors = extra_colors/255
+    extra_colors = extra_colors / 255
 
     return extra_colors
 
@@ -237,8 +237,7 @@ def rgb_color_list(color_names, parameters):
     Gets a list of RGB codes for a list of color names.
     '''
     rgb_codes = [
-        get_rgb_from_name(color_name, parameters)
-        for color_name in color_names
+        get_rgb_from_name(color_name, parameters) for color_name in color_names
     ]
 
     return rgb_codes
@@ -276,18 +275,20 @@ def register_color_bars(parameters):
 
         color_bar_dictionary[color_bar] = {}
         for base_color_index, base_color in enumerate(
-                base_colors_for_color_bar):
+            base_colors_for_color_bar
+        ):
             # We create a list of entries for that base color
             # It is a list so that we can append,
             # but we will need to convert it to a tuple
             base_color_entries = []
             for color_bar_index, (color_step, color_bar_color) in enumerate(
-                    zip(color_steps, color_bar_colors)):
+                zip(color_steps, color_bar_colors)
+            ):
                 # We get the ton by getting the RGB values of the
                 # color bar color and taking the corresponding base index
                 color_bar_color_tone = get_rgb_from_name(
-                    color_bar_color, parameters)[
-                    base_color_index]
+                    color_bar_color, parameters
+                )[base_color_index]
 
                 base_color_entries.append(
                     # The subtuples consist of the color step
@@ -301,19 +302,21 @@ def register_color_bars(parameters):
                         # See
                         # https://matplotlib.org/stable/gallery/color/custom_cmap.html
                         # for details
-                        color_bar_color_tone
+                        color_bar_color_tone,
                     )
                 )
             # We now convert the list to a tuple and put it into
             # the dictionary
             color_bar_dictionary[color_bar][base_color] = tuple(
-                base_color_entries)
+                base_color_entries
+            )
 
     # We now add the color bars to the color maps
 
     for color_bar in color_bars:
         color_bar_to_register = matplotlib.colors.LinearSegmentedColormap(
-            color_bar, color_bar_dictionary[color_bar])
+            color_bar, color_bar_dictionary[color_bar]
+        )
 
         if color_bar_to_register.name not in matplotlib.pyplot.colormaps():
             matplotlib.colormaps.register(color_bar_to_register)
@@ -331,44 +334,43 @@ def get_season(time_stamp):
         time_stamp.year, time_stamp.month, time_stamp.day, 0, 0
     )
     seasons = [
+        (
+            'winter',
             (
-                'winter',
-                (
-                    datetime.datetime(date.year, 1, 1),
-                    datetime.datetime(date.year, 3, 20)
-                )
+                datetime.datetime(date.year, 1, 1),
+                datetime.datetime(date.year, 3, 20),
             ),
+        ),
+        (
+            'spring',
             (
-                'spring',
-                (
-                    datetime.datetime(date.year, 3, 21),
-                    datetime.datetime(date.year, 6, 20)
-                )
+                datetime.datetime(date.year, 3, 21),
+                datetime.datetime(date.year, 6, 20),
             ),
+        ),
+        (
+            'summer',
             (
-                'summer',
-                (
-                    datetime.datetime(date.year, 6, 21),
-                    datetime.datetime(date.year, 9, 22)
-                )
+                datetime.datetime(date.year, 6, 21),
+                datetime.datetime(date.year, 9, 22),
             ),
+        ),
+        (
+            'fall',
             (
-                'fall',
-                (
-                    datetime.datetime(date.year, 9, 23),
-                    datetime.datetime(date.year, 12, 20)
-                )
+                datetime.datetime(date.year, 9, 23),
+                datetime.datetime(date.year, 12, 20),
             ),
+        ),
+        (
+            'winter',
             (
-                'winter',
-                (
-                    datetime.datetime(date.year, 12, 21),
-                    datetime.datetime(date.year, 12, 31)
-                )
-            )
+                datetime.datetime(date.year, 12, 21),
+                datetime.datetime(date.year, 12, 31),
+            ),
+        ),
     ]
     for season, (start, end) in seasons:
-
         if start <= date <= end:
             return season
 
@@ -389,15 +391,13 @@ def save_figure(figure, figure_name, output_folder, parameters):
     for file_type in outputs:
         if outputs[file_type]:
             figure.savefig(
-                f'{output_folder}/{figure_name}.{file_type}',
-                dpi=dpi_to_use
+                f'{output_folder}/{figure_name}.{file_type}', dpi=dpi_to_use
             )
 
 
 def save_dataframe(
-        dataframe, dataframe_name, groupfile_name,
-        output_folder, parameters
-        ):
+    dataframe, dataframe_name, groupfile_name, output_folder, parameters
+):
     '''
     This function saves a pandas dataframe to a number of
     file formats and an output folder that are all specified in a
@@ -432,9 +432,19 @@ def save_dataframe(
     dataframe_outputs = file_parameters['dataframe_outputs']
 
     file_types = [
-        'csv', 'json', 'html', 'latex', 'xml', 'clipboard',
-        'excel', 'hdf', 'feather', 'parquet',
-        'stata', 'pickle', 'sql'
+        'csv',
+        'json',
+        'html',
+        'latex',
+        'xml',
+        'clipboard',
+        'excel',
+        'hdf',
+        'feather',
+        'parquet',
+        'stata',
+        'pickle',
+        'sql',
     ]
     # Note that pandas has a few more export formats that we skipped
     # orc is not supported in arrows (ar least on Windows)
@@ -445,17 +455,37 @@ def save_dataframe(
     # but can still be used locally, so the function supports it.
 
     file_extensions = [
-        'csv', 'json', 'html', 'tex', 'xml', '',
-        'xlsx', 'h5', 'feather', 'parquet',
-        'dta', 'pkl', 'sqlite3'
+        'csv',
+        'json',
+        'html',
+        'tex',
+        'xml',
+        '',
+        'xlsx',
+        'h5',
+        'feather',
+        'parquet',
+        'dta',
+        'pkl',
+        'sqlite3',
     ]
 
     # This determines if the dataframe is saved into its own file
     # or into a group file (such as a database or an Excel Workbook)
     is_groupfile_per_type = [
-        False, False, False, False, False, False,
-        True, True, False, False,
-        False, False, True
+        False,
+        False,
+        False,
+        False,
+        False,
+        False,
+        True,
+        True,
+        False,
+        False,
+        False,
+        False,
+        True,
     ]
 
     file_functions = []
@@ -486,9 +516,8 @@ def save_dataframe(
             # not need to be corrected here
             code_for_invalid_characters = '[^0-9a-zA-Z_.]'
 
-            dataframe_to_use.columns = (
-                dataframe_to_use.columns.str.replace(
-                    code_for_invalid_characters,  '_', regex=True)
+            dataframe_to_use.columns = dataframe_to_use.columns.str.replace(
+                code_for_invalid_characters, '_', regex=True
             )
 
             if dataframe_to_use.index.name:
@@ -496,7 +525,8 @@ def save_dataframe(
                 # has a name. This causes issues if we try to replace
                 # things if the index does not have a name
                 dataframe_to_use.index.name = (
-                    dataframe_to_use.index.name.replace(' ', '_'))
+                    dataframe_to_use.index.name.replace(' ', '_')
+                )
             elif dataframe_to_use.index.names:
                 # MultiIndex has to be treated sepaartely
                 if dataframe_to_use.index.names[0] is not None:
@@ -523,12 +553,18 @@ def save_dataframe(
     ]
 
     for (
-        file_type, file_extension, file_function, using_file_type,
-        is_groupfile
-        ) in zip(
-                file_types, file_extensions, file_functions, using_file_types,
-                is_groupfile_per_type):
-
+        file_type,
+        file_extension,
+        file_function,
+        using_file_type,
+        is_groupfile,
+    ) in zip(
+        file_types,
+        file_extensions,
+        file_functions,
+        using_file_types,
+        is_groupfile_per_type,
+    ):
         if using_file_type:
             if is_groupfile:
                 file_to_use = (
@@ -536,9 +572,7 @@ def save_dataframe(
                 )
 
                 if file_type == 'hdf':
-                    file_function(
-                        file_to_use,
-                        key=dataframe_name)
+                    file_function(file_to_use, key=dataframe_name)
                 elif file_type == 'excel':
                     # If we want to append a sheet to an Excel file
                     # instead of replacing the existing file, we need
@@ -547,29 +581,27 @@ def save_dataframe(
                     # exists
                     if os.path.exists(file_to_use):
                         writer_to_use = pd.ExcelWriter(
-                            file_to_use, engine='openpyxl', mode='a',
-                            if_sheet_exists='replace'
-                            )
+                            file_to_use,
+                            engine='openpyxl',
+                            mode='a',
+                            if_sheet_exists='replace',
+                        )
                         with writer_to_use:
                             file_function(
-                                writer_to_use,
-                                sheet_name=dataframe_name
+                                writer_to_use, sheet_name=dataframe_name
                             )
                     else:
                         # If the file does not exist, we need to use the
                         # function, which is to_excel() with the file name,
                         # not with a writer
-                        file_function(
-                            file_to_use,
-                            sheet_name=dataframe_name
-                            )
+                        file_function(file_to_use, sheet_name=dataframe_name)
 
                 elif file_type == 'sql':
                     with sqlite3.connect(file_to_use) as sql_connection:
                         file_function(
                             dataframe_name,
                             con=sql_connection,
-                            if_exists='replace'
+                            if_exists='replace',
                         )
 
             else:
@@ -580,8 +612,12 @@ def save_dataframe(
 
 
 def put_dataframe_in_sql_in_chunks(
-        source_dataframe, sql_file, table_name, chunk_size,
-        drop_existing_table=True):
+    source_dataframe,
+    sql_file,
+    table_name,
+    chunk_size,
+    drop_existing_table=True,
+):
     '''
     This function takes a Dataframe and writes it into the table
     of an SQL database. It does so in chunks to avoid memory issues.
@@ -604,8 +640,7 @@ def put_dataframe_in_sql_in_chunks(
             table_action = 'append'
 
         while chunk_end < data_length:
-
-            chunk_end = min(chunk_start+chunk_size, data_length)
+            chunk_end = min(chunk_start + chunk_size, data_length)
             # We select the corresponding chunk in the dataframe and
             # write it to the SQL database
             dataframe_chunk = source_dataframe.iloc[chunk_start:chunk_end]
@@ -614,7 +649,7 @@ def put_dataframe_in_sql_in_chunks(
                 table_name, con=sql_connection, if_exists=table_action
             )
 
-            chunk_start = chunk_end+1
+            chunk_start = chunk_end + 1
             # Subsequent additions append in all cases
             table_action = 'append'
 
@@ -660,8 +695,12 @@ def from_grib_to_dataframe(grib_file):
 
 
 def read_query_generator(
-        quantities_to_display, source_table, query_filter_quantities,
-        query_filter_types, query_filter_values):
+    quantities_to_display,
+    source_table,
+    query_filter_quantities,
+    query_filter_types,
+    query_filter_values,
+):
     '''
     This function returns an sql read/select query string that can be used
     (for example) in Panda's read_sql.
@@ -713,8 +752,7 @@ def read_query_generator(
     '''
 
     query_filter = make_query_filter(
-        query_filter_quantities,
-        query_filter_types, query_filter_values
+        query_filter_quantities, query_filter_types, query_filter_values
     )
 
     output_query = (
@@ -817,7 +855,8 @@ def get_map_borders(NUTS_level, parameters):
     border_data_file_suffix = maps_parameters['border_data_file_suffix']
 
     border_data_file = (
-        f'{border_data_file_prefix}{NUTS_level}{border_data_file_suffix}')
+        f'{border_data_file_prefix}{NUTS_level}{border_data_file_suffix}'
+    )
 
     border_data = gpd.read_file(f'{map_data_folder}/{border_data_file}')
 
@@ -835,7 +874,8 @@ def get_map_points(NUTS_level, parameters):
     points_data_file_suffix = maps_parameters['points_data_file_suffix']
 
     points_data_file = (
-        f'{points_data_file_prefix}{NUTS_level}{points_data_file_suffix}')
+        f'{points_data_file_prefix}{NUTS_level}{points_data_file_suffix}'
+    )
 
     points_data = gpd.read_file(f'{map_data_folder}/{points_data_file}')
 
@@ -843,28 +883,35 @@ def get_map_points(NUTS_level, parameters):
 
 
 def make_spider_chart(
-        spider_plot,
-        series_label,
-        data_labels, data_values, markers, marker_labels,
-        spider_color, spider_marker, spider_linewidth,
-        spider_alpha
-        ):
-
-    angles = np.linspace(0, 2*np.pi, len(data_labels), endpoint=False)
+    spider_plot,
+    series_label,
+    data_labels,
+    data_values,
+    markers,
+    marker_labels,
+    spider_color,
+    spider_marker,
+    spider_linewidth,
+    spider_alpha,
+):
+    angles = np.linspace(0, 2 * np.pi, len(data_labels), endpoint=False)
 
     angles = np.concatenate((angles, [angles[0]]))
     data_labels = np.concatenate((data_labels, [data_labels[0]]))
     data_values = np.concatenate((data_values, [data_values[0]]))
 
     spider_plot.plot(
-        angles, data_values, marker=spider_marker,
-        linewidth=spider_linewidth, color=spider_color,
-        label=series_label
+        angles,
+        data_values,
+        marker=spider_marker,
+        linewidth=spider_linewidth,
+        color=spider_color,
+        label=series_label,
     )
     spider_plot.fill(
         angles, data_values, alpha=spider_alpha, color=spider_color
     )
-    spider_plot.set_thetagrids(angles * 180/np.pi, data_labels)
+    spider_plot.set_thetagrids(angles * 180 / np.pi, data_labels)
     spider_plot.set_yticks(markers)
     spider_plot.set_yticklabels(marker_labels)
     spider_plot.legend()
@@ -873,9 +920,14 @@ def make_spider_chart(
 
 
 def update_database_table(
-        database_to_update, table_to_update, columns_to_update, new_values,
-        query_filter_quantities,
-        query_filter_types, query_filter_values):
+    database_to_update,
+    table_to_update,
+    columns_to_update,
+    new_values,
+    query_filter_quantities,
+    query_filter_types,
+    query_filter_values,
+):
     '''
     This function updates the values
     of one row of a table in a database.
@@ -922,7 +974,6 @@ def update_database_table(
     first_set = True
     set_query = ''
     for set_element, element_values in zip(columns_to_update, new_values):
-
         if first_set:
             set_query += f'set '
             first_set = False
@@ -932,14 +983,11 @@ def update_database_table(
         set_query += f'{set_element} = {element_values}'
 
     query_filter = make_query_filter(
-        query_filter_quantities,
-        query_filter_types, query_filter_values
-        )
+        query_filter_quantities, query_filter_types, query_filter_values
+    )
 
     update_query = (
-        f'update {table_to_update} '
-        f'{set_query} '
-        f'{query_filter};'
+        f'update {table_to_update} ' f'{set_query} ' f'{query_filter};'
     )
 
     with sqlite3.connect(database_to_update) as database_connection:
@@ -949,8 +997,8 @@ def update_database_table(
 
 
 def make_query_filter(
-        query_filter_quantities,
-        query_filter_types, query_filter_values):
+    query_filter_quantities, query_filter_types, query_filter_values
+):
     '''
     Returns a query filter stringthat can be used in an SQL query.
      The input parameters are:
@@ -988,7 +1036,6 @@ def make_query_filter(
     for filter_quantity, filter_type, filter_value in zip(
         query_filter_quantities, query_filter_types, query_filter_values
     ):
-
         if first_filter:
             query_filter = f'where '
             first_filter = False
@@ -1006,7 +1053,6 @@ def make_query_filter(
             # different for tuples
 
             if type(filter_quantity) is tuple:
-
                 tuple_content_string = ','.join(filter_quantity)
                 filter_quantity = f'({tuple_content_string})'
 
@@ -1018,8 +1064,7 @@ def make_query_filter(
                 filter_value = [f'{my_value}' for my_value in filter_value]
                 filter_value = ','.join(filter_value)
                 query_filter = (
-                    f'{query_filter} {filter_quantity} '
-                    f'in ({filter_value})'
+                    f'{query_filter} {filter_quantity} ' f'in ({filter_value})'
                 )
 
         else:
@@ -1037,10 +1082,7 @@ def read_table_from_database(table_name, database_file):
     dataframe
     '''
     with sqlite3.connect(database_file) as sql_connection:
-
-        table_query = read_query_generator(
-            '*', f'"{table_name}"', [], [], []
-        )
+        table_query = read_query_generator('*', f'"{table_name}"', [], [], [])
 
         table_to_read = pd.read_sql(table_query, sql_connection)
 
@@ -1048,7 +1090,6 @@ def read_table_from_database(table_name, database_file):
 
 
 if __name__ == '__main__':
-
     series_label = 'SFC'
     data_values = [0.1, 0.26, 0.42, 0.89, 0.77, 0.66]
     data_labels = ['Mango', 'Mapo', 'Lacrosse', 'Floorball', 'Switch', 'NDS']
@@ -1064,8 +1105,14 @@ if __name__ == '__main__':
     spider_plot = make_spider_chart(
         spider_plot,
         series_label,
-        data_labels, data_values, markers, marker_labels,
-        spider_color, spider_marker, spider_linewidth, spider_alpha
+        data_labels,
+        data_values,
+        markers,
+        marker_labels,
+        spider_color,
+        spider_marker,
+        spider_linewidth,
+        spider_alpha,
     )
     spider_color = 'dodgerblue'
     series_label = 'GSHC'
@@ -1073,7 +1120,13 @@ if __name__ == '__main__':
     spider_plot = make_spider_chart(
         spider_plot,
         series_label,
-        data_labels, data_values, markers, marker_labels,
-        spider_color, spider_marker, spider_linewidth, spider_alpha
+        data_labels,
+        data_values,
+        markers,
+        marker_labels,
+        spider_color,
+        spider_marker,
+        spider_linewidth,
+        spider_alpha,
     )
     plt.show()
