@@ -54,6 +54,9 @@ This function takes a grib file and converts it to a DataFrame.
 26. **update_database_table:** Returns a query filter stringthat can be used
 27. **read_table_from_database:** Returns a table from a database
 in an SQL query.
+28. **put_dataframe_in_word_document:** Puts a DataFrame in a Word document
+29. **make_cell_text_vertical:**: Changes the orientation of a Word table cell
+to vertical
 '''
 
 import os
@@ -76,6 +79,7 @@ import matplotlib
 import xarray as xr
 import geopandas as gpd
 import matplotlib.pyplot as plt
+import docx
 
 
 def check_if_folder_exists(folder_to_check):
@@ -1087,6 +1091,204 @@ def read_table_from_database(table_name, database_file):
         table_to_read = pd.read_sql(table_query, sql_connection)
 
     return table_to_read
+
+
+def put_dataframe_in_word_document(
+    dataframe_to_put,
+    word_document_name,
+    number_formats=['.2f'],
+    table_style='Normal Table',
+    empty_code='',
+    cell_font_size=11,
+    headers_font_size=11,
+    merge_headers=True,
+    flip_merged_rows=True,
+    bottom_to_top=True,
+):
+    '''
+    This function puts a Dataframe into a given Word document.
+    If the document does not exist, it is created.
+    You can also optionally specify number formats fpr each column (in a list).
+    If you do not provide the same amount of formats as there are columns
+    in your DataFrame, then only the first one will be used across all columns.
+    If you don't provide any format list, then the default is that your numbers
+    will be displayed with two decimals.
+    You can also provide a table format.
+    Note that the table style must exist in the document for you to be able to
+    use it (so make make document, put a table in it with the style you
+    want, and delete the table before saving). If it does not, you can use the
+    defaults listed here:
+    https://python-docx.readthedocs.io/en/latest/user/styles-understanding.html
+    or simply omit the style argument.
+    You can also indicate which code you want to use for empty values
+    (the default is an empty string)
+    Identical headers are merged by default and merged rows have their text
+    flipped by default (you can also chnage the default
+    bottom to top flip)
+    '''
+
+    headers_font_size = docx.shared.Pt(headers_font_size)
+    cell_font_size = docx.shared.Pt(cell_font_size)
+    # We first check if the fle exists. If not, we create it
+    if not os.path.isfile(word_document_name):
+        target_document = docx.Document()
+    else:
+        target_document = docx.Document(word_document_name)
+
+    # If the user has provided less number formats (e.g. only one) than there
+    # are columns (more also triggers this),
+    # we put the same number format for all columns. This makes most sense if
+    # there is only one format. If the user has provided more than one, but
+    # less than the amount of columns, then there is an issue.
+    if len(number_formats) != len(dataframe_to_put.columns):
+        number_formats = [number_formats[0]] * len(dataframe_to_put.columns)
+        if len(number_formats) > 1:
+            print('You have provided several number formats.')
+            print('But less than th amounts of columns.')
+            print('We have used the first of your numver formats.')
+            print('Please correct yur entry')
+
+    # Weput a space before the table
+    target_document.add_paragraph()
+
+    # We want to know how many rows are for column headers and how many
+    # columns are for index/row headers
+    column_index_depth = dataframe_to_put.columns.nlevels
+    row_index_depth = dataframe_to_put.index.nlevels
+
+    # With these, we know how big our table has to be.
+    # We create a table in the document
+    table_in_document = target_document.add_table(
+        rows=dataframe_to_put.shape[0] + column_index_depth,
+        cols=dataframe_to_put.shape[1] + row_index_depth,
+        style=table_style,
+    )
+
+    # We put the column headers in
+    for column_index, column_header in enumerate(dataframe_to_put.columns):
+        # If there are several levels, we need to go through them
+        if column_index_depth > 1:
+            for column_entry_index, column_entry in enumerate(column_header):
+                current_cell = table_in_document.cell(
+                    column_entry_index, column_index + row_index_depth
+                )
+                current_cell.text = str(
+                    column_entry
+                )  # We need a string to put in the table
+                current_cell.paragraphs[0].runs[
+                    0
+                ].font.size = headers_font_size
+
+                if merge_headers:
+                    if column_index > 0:
+                        previous_cell = table_in_document.cell(
+                            column_entry_index,
+                            column_index + row_index_depth - 1,
+                        )
+                        if str(column_entry) == previous_cell.text:
+                            previous_cell.merge(current_cell)
+                            previous_cell.text = str(column_entry)
+
+        # Otherwise, we just put the entries
+        else:
+            current_cell = table_in_document.cell(
+                0, column_index + row_index_depth
+            )
+            current_cell.text = str(
+                column_header
+            )  # We need a string to put in the table
+            current_cell.paragraphs[0].runs[0].font.size = headers_font_size
+
+    # We put the index/row headers in
+    for row_index, row_header in enumerate(dataframe_to_put.index):
+        # If there are several levels, we need to go through them
+        if row_index_depth > 1:
+            for row_entry_index, row_entry in enumerate(row_header):
+                current_cell = table_in_document.cell(
+                    row_index + column_index_depth, row_entry_index
+                )
+                current_cell.text = str(
+                    row_entry
+                )  # We need a string to put in the table
+                current_cell.paragraphs[0].runs[
+                    0
+                ].font.size = headers_font_size
+                if merge_headers:
+                    if column_index > 0:
+                        previous_cell = table_in_document.cell(
+                            row_index + column_index_depth - 1, row_entry_index
+                        )
+                        if str(row_entry) == previous_cell.text:
+                            previous_cell.merge(current_cell)
+                            previous_cell.text = str(row_entry)
+                            make_cell_text_vertical(
+                                previous_cell, bottom_to_top
+                            )
+
+        # Otherwise, we just put the entries
+        else:
+            current_cell = table_in_document.cell(
+                row_index + column_index_depth, 0
+            )
+            current_cell.text = str(
+                row_header
+            )  # We need a string to put in the table
+            current_cell.paragraphs[0].runs[0].font.size = headers_font_size
+
+    # We now put the values in
+    for row_index, (row_header, row_values) in enumerate(
+        dataframe_to_put.iterrows()
+    ):
+        for value_index, (value, number_format) in enumerate(
+            zip(row_values.values, number_formats)
+        ):
+            current_cell = table_in_document.cell(
+                row_index + column_index_depth,
+                value_index + row_index_depth,
+            )
+            if value != value:
+                # If the value is empty, we use a code for thatcell
+                value = empty_code
+            if type(value) is not str:
+                value = f'{value:{number_format}}'
+            current_cell.text = str(value)
+
+            current_cell.paragraphs[0].runs[0].font.size = cell_font_size
+
+            # else:
+            #     # Otherwise, we use the code for empty values
+            #     current_cell.text = str(empty_code)
+            #     current_cell.paragraphs[0].runs[0].font.size=cell_font_size
+
+    # We add space after the table
+    target_document.add_paragraph()
+
+    # We save the document
+    target_document.save(word_document_name)
+
+
+def make_cell_text_vertical(cell, bottom_to_top=True):
+    '''
+    Changes the orientation of a Word table cell to vertical,
+    with the option to get text from bottom to top (default)
+    or top to bottom (set the optional bottom_to_top argument to True
+    See
+    https://stackoverflow.com/questions/47738013/how-to-rotate-text-in-table-cells
+    for a breakdown
+    '''
+
+    if bottom_to_top:
+        orientation_code = 'btLr'
+    else:
+        orientation_code = 'tbRl'
+
+    # We get the cell properties
+    cell_properties = cell._tc.get_or_add_tcPr()
+    # We get the textDirection and set it to our chosen direcion
+    textDirection = docx.oxml.OxmlElement('w:textDirection')
+    textDirection.set(docx.oxml.ns.qn('w:val'), orientation_code)
+    # We change the cell'sproperties
+    cell_properties.append(textDirection)
 
 
 if __name__ == '__main__':

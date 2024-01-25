@@ -120,6 +120,9 @@ This function takes a grib file and converts it to a DataFrame.
 in an SQL query.
 27. **read_table_from_database:** Returns a table from a database
 in an SQL query.
+28. **put_dataframe_in_word_document:** Puts a DataFrame in a Word document
+29. **make_cell_text_vertical:**: Changes the orientation of a Word table cell
+to vertical
 
 ## Acknowledgements
 This CookBook has been developed within multiple projects,
