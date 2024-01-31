@@ -123,6 +123,9 @@ in an SQL query.
 28. **put_dataframe_in_word_document:** Puts a DataFrame in a Word document
 29. **make_cell_text_vertical:**: Changes the orientation of a Word table cell
 to vertical
+30. **delete_word_element:**  Deletes a give element in a Word document.
+31. **clear_word_document:** Clears a Word document of its elements
+(text/paragraphs, tables, pictures.)
 
 ## Acknowledgements
 This CookBook has been developed within multiple projects,

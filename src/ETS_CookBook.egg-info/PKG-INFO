@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: ETS_CookBook
-Version: 1.0.6
+Version: 1.0.7
 Summary: The ETS (TNO) CookBook of useful Python Scripts
 Author-email: Omar Usmani <Omar.Usmani@TNO.nl>
 Project-URL: Homepage, https://github.com/TNO/ETS_CookBook
@@ -13,7 +13,9 @@ License-File: LICENCE
 License-File: LICENSE
 Requires-Dist: attrs==23.1.0
 Requires-Dist: beautifulsoup4==4.12.2
+Requires-Dist: black==23.12.1
 Requires-Dist: blosc2==2.0.0
+Requires-Dist: build==1.0.3
 Requires-Dist: cdsapi==0.6.1
 Requires-Dist: certifi==2023.7.22
 Requires-Dist: cffi==1.15.1
@@ -40,19 +42,24 @@ Requires-Dist: lxml==4.9.3
 Requires-Dist: MarkupSafe==2.1.3
 Requires-Dist: matplotlib==3.7.2
 Requires-Dist: msgpack==1.0.5
+Requires-Dist: mypy-extensions==1.0.0
 Requires-Dist: numexpr==2.8.4
 Requires-Dist: numpy==1.24.3
 Requires-Dist: openpyxl==3.1.2
 Requires-Dist: packaging==23.1
 Requires-Dist: pandas==2.0.1
+Requires-Dist: pathspec==0.12.1
 Requires-Dist: Pillow==10.0.0
+Requires-Dist: platformdirs==4.1.0
 Requires-Dist: py-cpuinfo==9.0.0
 Requires-Dist: pyarrow==12.0.1
 Requires-Dist: pycodestyle==2.11.0
 Requires-Dist: pycparser==2.21
 Requires-Dist: pyparsing==3.0.9
 Requires-Dist: pyproj==3.6.0
+Requires-Dist: pyproject_hooks==1.0.0
 Requires-Dist: python-dateutil==2.8.2
+Requires-Dist: python-docx==1.1.0
 Requires-Dist: pytz==2023.3
 Requires-Dist: requests==2.31.0
 Requires-Dist: shapely==2.0.1
@@ -60,6 +67,7 @@ Requires-Dist: six==1.16.0
 Requires-Dist: soupsieve==2.4.1
 Requires-Dist: tables==3.8.0
 Requires-Dist: tqdm==4.65.0
+Requires-Dist: typing_extensions==4.9.0
 Requires-Dist: tzdata==2023.3
 Requires-Dist: urllib3==2.0.4
 Requires-Dist: xarray==2023.7.0
@@ -189,6 +197,9 @@ in an SQL query.
 28. **put_dataframe_in_word_document:** Puts a DataFrame in a Word document
 29. **make_cell_text_vertical:**: Changes the orientation of a Word table cell
 to vertical
+30. **delete_word_element:**  Deletes a give element in a Word document.
+31. **clear_word_document:** Clears a Word document of its elements
+(text/paragraphs, tables, pictures.)
 
 ## Acknowledgements
 This CookBook has been developed within multiple projects,

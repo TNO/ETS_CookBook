@@ -55,8 +55,11 @@ This function takes a grib file and converts it to a DataFrame.
 27. **read_table_from_database:** Returns a table from a database
 in an SQL query.
 28. **put_dataframe_in_word_document:** Puts a DataFrame in a Word document
-29. **make_cell_text_vertical:**: Changes the orientation of a Word table cell
+29. **make_cell_text_vertical:** Changes the orientation of a Word table cell
 to vertical
+30. **delete_word_element:**  Deletes a give element in a Word document.
+31. **clear_word_document:** Clears a Word document of its elements
+(text/paragraphs, tables, pictures.)
 '''
 
 import os
@@ -1289,6 +1292,32 @@ def make_cell_text_vertical(cell, bottom_to_top=True):
     textDirection.set(docx.oxml.ns.qn('w:val'), orientation_code)
     # We change the cell'sproperties
     cell_properties.append(textDirection)
+
+
+def delete_word_element(element_reference):
+    '''
+    Deletes a give element in a Word document.
+    '''
+    element = element_reference._element
+    element.getparent().remove(element)
+
+
+def clear_word_document(document_file_name):
+    '''
+    Clears a Word document of its elements
+    (text/paragraphs, tables, pictures.)
+    '''
+    target_document = docx.Document(document_file_name)
+
+    for paragraph in target_document.paragraphs:
+        delete_word_element(paragraph)
+    for table in target_document.tables:
+        delete_word_element(table)
+    for shape in target_document.inline_shapes:
+        # This includes pictures
+        delete_word_element(shape)
+
+    target_document.save(document_file_name)
 
 
 if __name__ == '__main__':
