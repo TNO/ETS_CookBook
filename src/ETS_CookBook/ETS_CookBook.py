@@ -123,10 +123,13 @@ def reference_scale(number_list: 'list[float]', digit_shift: int = 0):
 
     number_list_boundaries = [min(number_list), max(number_list)]
     boundary_powers_of_ten = [
-        int(math.log10(number)) - digit_shift
+        int(math.log10(abs(number))) - digit_shift
         # The first term gives us the power of ten of the highest digit,
         # which we shift with the digit_shift parameter
+        if number != 0
+        else 0
         for number in number_list_boundaries
+        
     ]
 
     dividers = [math.pow(10, power) for power in boundary_powers_of_ten]
@@ -1149,7 +1152,7 @@ def put_dataframe_in_word_document(
             print('You have provided several number formats.')
             print('But less than th amounts of columns.')
             print('We have used the first of your numver formats.')
-            print('Please correct yur entry')
+            print('Please correct your entry')
 
     # Weput a space before the table
     target_document.add_paragraph()
@@ -1322,13 +1325,14 @@ def clear_word_document(document_file_name):
 
 if __name__ == '__main__':
     series_label = 'SFC'
-    data_values = [0.1, 0.26, 0.42, 0.89, 0.77, 0.66]
+    data_values = [-6, 0, 0.26, 0.42, 0.89, 0.77, 0.66]
     data_labels = ['Mango', 'Mapo', 'Lacrosse', 'Floorball', 'Switch', 'NDS']
     markers = [0, 0.25, 0.50, 0.75, 1.0]
     marker_labels = ['0%', '25%', '50%', '75%', '100%']
     spider_color = 'fuchsia'
     spider_marker = 'o'
     spider_linewidth = 2
+  
 
     spider_figure = plt.figure()
     spider_plot = spider_figure.add_subplot(111, polar=True)
