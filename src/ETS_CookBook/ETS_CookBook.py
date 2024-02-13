@@ -62,9 +62,9 @@ to vertical
 (text/paragraphs, tables, pictures.)
 '''
 
-import os
 import datetime
 import math
+import os
 import sqlite3
 import zipfile
 
@@ -73,16 +73,15 @@ try:
 except ModuleNotFoundError:
     import tomli as tomllib
 
-
-import requests
+import docx
+import geopandas as gpd
+import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 import openpyxl
 import pandas as pd
-import matplotlib
+import requests
 import xarray as xr
-import geopandas as gpd
-import matplotlib.pyplot as plt
-import docx
 
 
 def check_if_folder_exists(folder_to_check):
@@ -123,13 +122,14 @@ def reference_scale(number_list: 'list[float]', digit_shift: int = 0):
 
     number_list_boundaries = [min(number_list), max(number_list)]
     boundary_powers_of_ten = [
-        int(math.log10(abs(number))) - digit_shift
-        # The first term gives us the power of ten of the highest digit,
-        # which we shift with the digit_shift parameter
-        if number != 0
-        else 0
+        (
+            int(math.log10(abs(number))) - digit_shift
+            # The first term gives us the power of ten of the highest digit,
+            # which we shift with the digit_shift parameter
+            if number != 0
+            else 0
+        )
         for number in number_list_boundaries
-        
     ]
 
     dividers = [math.pow(10, power) for power in boundary_powers_of_ten]
@@ -1150,7 +1150,7 @@ def put_dataframe_in_word_document(
         number_formats = [number_formats[0]] * len(dataframe_to_put.columns)
         if len(number_formats) > 1:
             print('You have provided several number formats.')
-            print('But less than th amounts of columns.')
+            print('But less than the amounts of columns.')
             print('We have used the first of your numver formats.')
             print('Please correct your entry')
 
@@ -1332,7 +1332,6 @@ if __name__ == '__main__':
     spider_color = 'fuchsia'
     spider_marker = 'o'
     spider_linewidth = 2
-  
 
     spider_figure = plt.figure()
     spider_plot = spider_figure.add_subplot(111, polar=True)
