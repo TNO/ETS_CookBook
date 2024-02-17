@@ -1332,7 +1332,7 @@ def get_rgb_255_code_string(color_name, parameters):
     This is used for plotly.
     '''
     # We convert the color name to an RGB (0-255)
-    rgb_255 = 255 * cook.get_rgb_from_name(color_name, parameters)
+    rgb_255 = 255 * get_rgb_from_name(color_name, parameters)
     # We make it a string (and remove the 0 decimal via int conversion)
     rgb_255 = list(map(str, map(int, rgb_255)))
     rgb_255_code_string = f'({", ".join(rgb_255)})'
