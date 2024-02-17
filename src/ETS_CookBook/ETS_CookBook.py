@@ -60,6 +60,8 @@ to vertical
 30. **delete_word_element:**  Deletes a give element in a Word document.
 31. **clear_word_document:** Clears a Word document of its elements
 (text/paragraphs, tables, pictures.)
+32. **get_rgb_255_code_string:**Creates a string with rgb values 
+(0-255), such as rgb(111, 233, 66). This is used for plotly.
 '''
 
 import datetime
@@ -1321,6 +1323,21 @@ def clear_word_document(document_file_name):
         delete_word_element(shape)
 
     target_document.save(document_file_name)
+
+
+def get_rgb_255_code_string(color_name, parameters):
+    '''
+    Creates a string with rgb values (0-255),
+    rgb(111, 233, 66)
+    This is used for plotly.
+    '''
+    # We convert the color name to an RGB (0-255)
+    rgb_255 = 255 * cook.get_rgb_from_name(color_name, parameters)
+    # We make it a string (and remove the 0 decimal via int conversion)
+    rgb_255 = list(map(str, map(int, rgb_255)))
+    rgb_255_code_string = f'({", ".join(rgb_255)})'
+
+    return rgb_255_code_string
 
 
 if __name__ == '__main__':
