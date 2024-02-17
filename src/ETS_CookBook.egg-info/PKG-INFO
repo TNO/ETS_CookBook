@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: ETS_CookBook
-Version: 1.0.8
+Version: 1.0.9
 Summary: The ETS (TNO) CookBook of useful Python Scripts
 Author-email: Omar Usmani <Omar.Usmani@TNO.nl>
 Project-URL: Homepage, https://github.com/TNO/ETS_CookBook
@@ -200,6 +200,8 @@ to vertical
 30. **delete_word_element:**  Deletes a give element in a Word document.
 31. **clear_word_document:** Clears a Word document of its elements
 (text/paragraphs, tables, pictures.)
+32. **get_rgb_255_code_string:**Creates a string with rgb values 
+(0-255), such as rgb(111, 233, 66). This is used for plotly.
 
 ## Acknowledgements
 This CookBook has been developed within multiple projects,
