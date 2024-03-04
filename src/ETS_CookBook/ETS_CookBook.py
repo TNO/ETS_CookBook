@@ -1384,7 +1384,7 @@ def make_quantity_map(
     )
     lowest_value_to_display = display_reference_scale[0]
     highest_value_to_display = display_reference_scale[1]
-    color_bar_scale = mpl.colors.Normalize(
+    color_bar_scale = matplotlib.colors.Normalize(
         vmin=lowest_value_to_display, vmax=highest_value_to_display
     )
 
