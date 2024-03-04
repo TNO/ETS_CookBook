@@ -128,6 +128,16 @@ to vertical
 (text/paragraphs, tables, pictures.)
 32. **get_rgb_255_code_string:**Creates a string with rgb values 
 (0-255), such as rgb(111, 233, 66). This is used for plotly.
+33. **map grid:**This function creates a grid of maps. You need to give it the data you want
+    to plot, the names of the quantities, and their colors, as well as
+    some plot parameters (in your general parameters file, under
+    a [map_grid_plot]  header). You also need to have a map areas data file
+    such as this one:
+    https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/110m/cultural/ne_110m_admin_0_countries.zip
+    You also need to provide a csv file that translates the names of the
+    countries you are using into ISOA3 codes, which can be found here
+    https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3
+34. **make_quantity_map:** Makes one of the quantity maps in a map grid.
 
 ## Acknowledgements
 This CookBook has been developed within multiple projects,

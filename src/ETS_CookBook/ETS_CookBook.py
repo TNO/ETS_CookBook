@@ -62,6 +62,16 @@ to vertical
 (text/paragraphs, tables, pictures.)
 32. **get_rgb_255_code_string:**Creates a string with rgb values 
 (0-255), such as rgb(111, 233, 66). This is used for plotly.
+33. **map grid:**This function creates a grid of maps. You need to give it the data you want
+    to plot, the names of the quantities, and their colors, as well as
+    some plot parameters (in your general parameters file, under
+    a [map_grid_plot]  header). You also need to have a map areas data file
+    such as this one:
+    https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/110m/cultural/ne_110m_admin_0_countries.zip
+    You also need to provide a csv file that translates the names of the
+    countries you are using into ISOA3 codes, which can be found here
+    https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3
+34. **make_quantity_map:** Makes one of the quantity maps in a map grid.
 '''
 
 import datetime
@@ -1340,7 +1350,173 @@ def get_rgb_255_code_string(color_name, parameters):
     return rgb_255_code_string
 
 
+def make_quantity_map(
+    quantity_display_name,
+    plot_data,
+    map_areas,
+    quantity_plot,
+    quantity_color,
+    map_grid_plot_parameters,
+    parameters,
+):
+    '''
+    Makes one of the quantity maps in a map grid.
+    '''
+    # We get some display parameters
+    no_data_color = get_rgb_from_name(
+        map_grid_plot_parameters['no_data_color'], parameters
+    )
+    heat_bar_map = quantity_color
+    values_column = map_grid_plot_parameters['values_column']
+    plot_title_font_size = map_grid_plot_parameters['plot_title_font_size']
+    map_x_range = map_grid_plot_parameters['map_x_range']
+    map_y_range = map_grid_plot_parameters['map_y_range']
+
+    # We create a range for the values to display (for the
+    # scale of the legend bar).
+    values_to_plot = plot_data[values_column].values
+
+    lowest_value_to_plot = values_to_plot.min()
+    highest_value_to_plot = values_to_plot.max()
+
+    display_reference_scale = reference_scale(
+        [lowest_value_to_plot, highest_value_to_plot], 1
+    )
+    lowest_value_to_display = display_reference_scale[0]
+    highest_value_to_display = display_reference_scale[1]
+    color_bar_scale = mpl.colors.Normalize(
+        vmin=lowest_value_to_display, vmax=highest_value_to_display
+    )
+
+    # We plot the areas of the geographical entities (that is, the map
+    # without the data) in the no-data color
+    map_areas.plot(
+        ax=quantity_plot,
+        facecolor=no_data_color,
+        edgecolor='face',
+    )
+
+    # We plot tha data on top of the map
+    plot_data.plot(
+        ax=quantity_plot,
+        column=values_column,
+        legend=True,
+        norm=color_bar_scale,
+        cmap=heat_bar_map,
+        antialiased=True,
+        edgecolor='face',
+    )
+
+    # We set the display area, remove the axes and set the title
+    quantity_plot.set_ylim(map_y_range[0], map_y_range[1])
+    quantity_plot.set_xlim(map_x_range[0], map_x_range[1])
+    quantity_plot.axis('off')
+    quantity_plot.set_title(
+        quantity_display_name, fontsize=plot_title_font_size
+    )
+
+
+def map_grid(
+    quantities_data, quantity_display_names, quantity_colors, parameters
+):
+    '''
+    This function creates a grid of maps. You need to give it the data you want
+    to plot, the names of the quantities, and their colors, as well as
+    some plot parameters (in your general parameters file, under
+    a [map_grid_plot]  header). You also need to have a map areas data file
+    such as this one:
+    https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/110m/cultural/ne_110m_admin_0_countries.zip
+    You also need to provide a csv file that translates the names of the
+    countries you are using into ISOA3 codes, which can be found here
+    https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3
+
+    '''
+
+    # We read some parameters
+    file_parameters = parameters['files']
+    output_folder = file_parameters['output_folder']
+
+    map_grid_plot_parameters = parameters['map_grid_plot']
+    isoA3_file = map_grid_plot_parameters['isoA3_file']
+    isoA3_codes = pd.read_csv(f'{isoA3_file}')
+    isoA3_dict = dict(zip(isoA3_codes['Country'], isoA3_codes['IsoA3']))
+    iso_A3_header = map_grid_plot_parameters['iso_A3_header']
+    iso_A3_header_in_map_data = map_grid_plot_parameters[
+        'iso_A3_header_in_map_data'
+    ]
+
+    figure_title = map_grid_plot_parameters['figure_title']
+
+    number_of_rows = map_grid_plot_parameters['rows']
+    number_of_columns = map_grid_plot_parameters['columns']
+    map_data_folder = map_grid_plot_parameters['map_data_folder']
+    map_data_file = map_grid_plot_parameters['map_data_file']
+    zero_color = map_grid_plot_parameters['zero_color']
+
+    # We register the color bars (one per quantity color)
+
+    color_bars = parameters['color_bars']
+    for quantity_color in quantity_colors:
+        color_bars[quantity_color] = [zero_color, quantity_color]
+    register_color_bars(parameters)
+
+    # We read the map data from a file
+    map_areas = gpd.read_file(f'{map_data_folder}/{map_data_file}')
+
+    # We create a figure with one plot (grid element) for each quantity
+    # we want to display
+    grid_figure, quantity_plots = plt.subplots(
+        number_of_rows, number_of_columns
+    )
+
+    # We iterate through the quantities (data, display name, color)
+    for quantity_index, (
+        quantity_data,
+        quantity_display_name,
+        quantity_color,
+    ) in enumerate(
+        zip(
+            quantities_data,
+            quantity_display_names,
+            quantity_colors,
+        )
+    ):
+        # We determine the row and column where the quantity plot will go
+        quantity_row = quantity_index // number_of_columns
+        quantity_column = quantity_index % number_of_columns
+        quantity_plot = quantity_plots[quantity_row][quantity_column]
+
+        # We remap the country name in the data to its ISO A3 code
+        quantity_data[iso_A3_header] = quantity_data['Country'].map(isoA3_dict)
+        # We create the plot data
+        plot_data = pd.merge(
+            map_areas,
+            quantity_data,
+            left_on=iso_A3_header_in_map_data,
+            right_on=iso_A3_header,
+        )
+        # We make the plot
+        make_quantity_map(
+            quantity_display_name,
+            plot_data,
+            map_areas,
+            quantity_plot,
+            quantity_color,
+            map_grid_plot_parameters,
+            parameters,
+        )
+    # We put a suptitle and save the figure
+    grid_figure.suptitle(f'{figure_title}')
+    grid_figure.tight_layout()
+
+    save_figure(grid_figure, f'{figure_title}', output_folder, parameters)
+
+
 if __name__ == '__main__':
+
+    woo = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
+    print(woo)
+    exit()
     series_label = 'SFC'
     data_values = [-6, 0, 0.26, 0.42, 0.89, 0.77, 0.66]
     data_labels = ['Mango', 'Mapo', 'Lacrosse', 'Floorball', 'Switch', 'NDS']
