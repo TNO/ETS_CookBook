@@ -138,6 +138,8 @@ to vertical
     countries you are using into ISOA3 codes, which can be found here
     https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3
 34. **make_quantity_map:** Makes one of the quantity maps in a map grid.
+35. **put_plots_on_map:88 Puts plots/axes on a map figure. You can then
+draw in these.
 
 ## Acknowledgements
 This CookBook has been developed within multiple projects,
