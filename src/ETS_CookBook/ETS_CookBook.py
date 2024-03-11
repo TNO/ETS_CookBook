@@ -72,6 +72,8 @@ to vertical
     countries you are using into ISOA3 codes, which can be found here
     https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3
 34. **make_quantity_map:** Makes one of the quantity maps in a map grid.
+35. **put_plots_on_map:** Puts plots/axes on a map figure. You can then
+draw in these.
 '''
 
 import datetime
@@ -1510,6 +1512,78 @@ def map_grid(
     grid_figure.tight_layout()
 
     save_figure(grid_figure, f'{figure_title}', output_folder, parameters)
+
+
+def put_plots_on_map(
+    map_figure, map_data, map_parameters, plot_y_total_values
+):
+    '''
+    Puts plots/axes on a map figure. You can then draw in these.
+    The plot_y_total_values are the sizes of the plots per country (for example
+    the size of the stacked bar for a stacked bar plot)
+    '''
+
+    location_code_header = map_parameters['location_code_header']
+    map_data = map_data.set_index(location_code_header)
+
+    # We get the latitudes and longitudes of the locations (countries, e.g.)
+    location_longitudes_header = map_parameters['location_longitudes_header']
+    location_latitudes_header = map_parameters['location_latitudes_header']
+    map_data['latitude'] = map_data[location_latitudes_header].values
+    map_data['longitude'] = map_data[location_longitudes_header].values
+
+    scaling_parameters = map_parameters['scaling_parameters']
+    # These parameters determine the size and location parameters to place
+    # the plots and the necessary scaling factors. These should be adapted
+    # if the plots don't come at the right place (they can change
+    # if the scope of your map, or the size of your figure, for example)
+    # The following values were used when making the first example using this
+    # function
+    # x_size = 0.005
+    # y_size_max = 4
+    # y_size_scale = 0.05
+    # x_start = 0.51
+    # y_start = 0.5
+    # longitude_scaling = 0.7
+    # latitude_scaling = 0.47
+    # maximum_longitude = 180
+    # maximum_latitude = 90
+    x_size = scaling_parameters['x_size']
+    y_size_max = scaling_parameters['y_size_max']
+    y_size_scale = scaling_parameters['y_size_scale']
+    x_start = scaling_parameters['x_start']
+    y_start = scaling_parameters['y_start']
+    longitude_scaling = scaling_parameters['longitude_scaling']
+    latitude_scaling = scaling_parameters['latitude_scaling']
+    maximum_longitude = scaling_parameters['maximum_longitude']
+    maximum_latitude = scaling_parameters['maximum_latitude']
+
+    # We create a dictionary that contains a plot/axis on top for each
+    # location
+    plots_on_top = {}
+
+    # We iterate through the locations
+    for location in map_data.index:
+
+        # We check that there are values to plot for the location
+        if location in plot_y_total_values.index:
+            latitude = map_data.loc[location]['latitude']
+            longitude = map_data.loc[location]['longitude']
+            y_size = (
+                plot_y_total_values.loc[location] * y_size_scale / y_size_max
+            )
+            # We create the plot/axis with the right size and scaling factors
+            plots_on_top[location] = map_figure.add_axes(
+                [
+                    x_start
+                    * (1 + longitude_scaling * longitude / maximum_longitude),
+                    y_start
+                    * (1 + latitude_scaling * latitude / maximum_latitude),
+                    x_size,
+                    y_size,
+                ]
+            )
+    return plots_on_top
 
 
 if __name__ == '__main__':
