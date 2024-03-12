@@ -514,67 +514,71 @@ def save_dataframe(
 
     file_functions = []
     for file_type, is_groupfile in zip(file_types, is_groupfile_per_type):
-        if is_groupfile:  # So we avoid doing operations for unused types
-            # Some file formats require some extra processing, so
-            # we need to forgo list compreshension and use
-            # copies of the dataframe that we will modify
+   
+        # Some file formats require some extra processing, so
+        # we need to forgo list compreshension and use
+        # copies of the dataframe that we will modify
 
-            dataframe_to_use = dataframe.copy()
+        dataframe_to_use = dataframe.copy()
 
-            if file_type == 'feather':
-                # feather does not support serializing
-                #  <class 'pandas.core.indexes.base.Index'> for the index;
-                #   you can .reset_index() to make the index into column(s)
-                dataframe_to_use = dataframe_to_use.reset_index()
+        if file_type == 'feather':
+            # feather does not support serializing
+            #  <class 'pandas.core.indexes.base.Index'> for the index;
+            #   you can .reset_index() to make the index into column(s)
+            dataframe_to_use = dataframe_to_use.reset_index()
 
-            if file_type in ['xml', 'stata']:
-                # These file formats have issues with some characters
-                # in column and index names
-                # Note that for xml, the names cannot start with the letters
-                # xaml (with all case variations) and must start with a letter 
-                # or underscore (replacement of such issues is not implemented
-                # at the moment, so the function will fail unless you correct
-                # that in your data).
-                # Note that stata also has issues with too lonmg names
-                #  (>32 characters), but the to_stata function manages this on 
-                # its own (by cutting any excess characters). As such, this
-                # does not need to be corrected here
-                code_for_invalid_characters = '[^0-9a-zA-Z_.]'
+        if (file_type in ['xml', 'stata']) and is_groupfile:
+            # These file formats have issues with some characters
+            # in column and index names
+            # Note that for xml, the names cannot start with the letters
+            # xaml (with all case variations) and must start with a letter 
+            # or underscore (replacement of such issues is not implemented
+            # at the moment, so the function will fail unless you correct
+            # that in your data).
+            # Note that stata also has issues with too lonmg names
+            #  (>32 characters), but the to_stata function manages this on 
+            # its own (by cutting any excess characters). As such, this
+            # does not need to be corrected here
+            # We only do this if the user wants to use these file types,
+            # as it needs column headers to be strings to work,
+            # but other file types don't need all this and thus
+            # can still use column headers that aren't strings
+            code_for_invalid_characters = '[^0-9a-zA-Z_.]'
 
-                dataframe_to_use.columns = (
-                    dataframe_to_use.columns.str.replace(
-                        code_for_invalid_characters, '_', regex=True
-                    )
+            dataframe_to_use.columns = (
+                dataframe_to_use.columns.str.replace(
+                    code_for_invalid_characters, '_', regex=True
                 )
+            )
 
-                if dataframe_to_use.index.name:
-                    # We only need to do the replacements if the index
-                    # has a name. This causes issues if we try to replace
-                    # things if the index does not have a name
-                    dataframe_to_use.index.name = (
-                        dataframe_to_use.index.name.replace(' ', '_')
-                    )
-                elif dataframe_to_use.index.names:
-                    # MultiIndex has to be treated sepaartely
-                    if dataframe_to_use.index.names[0] is not None:
-                        dataframe_to_use.index.names = [
-                            old_name.replace(' ', '_')
-                            for old_name in dataframe_to_use.index.names
-                        ]
+            if dataframe_to_use.index.name:
+                # We only need to do the replacements if the index
+                # has a name. This causes issues if we try to replace
+                # things if the index does not have a name
+                dataframe_to_use.index.name = (
+                    dataframe_to_use.index.name.replace(' ', '_')
+                )
+            elif dataframe_to_use.index.names:
+                # MultiIndex has to be treated sepaartely
+                if dataframe_to_use.index.names[0] is not None:
+                    dataframe_to_use.index.names = [
+                        old_name.replace(' ', '_')
+                        for old_name in dataframe_to_use.index.names
+                    ]
 
-            function_name = f'to_{file_type}'
+        function_name = f'to_{file_type}'
 
-            if file_type == 'latex':
-                # In future versions `DataFrame.to_latex` is expected to 
-                # utilisethe base implementation of `Styler.to_latex` for 
-                # formatting and rendering. The arguments signature may
-                # therefore change.
-                # It is recommended instead to use `DataFrame.style.to_latex`
-                # which also contains additional functionality.
-                # function_name = f'Styler.to_{file_type}'
-                file_functions.append(dataframe_to_use.style.to_latex)
-            else:
-                file_functions.append(getattr(dataframe_to_use, function_name))
+        if file_type == 'latex':
+            # In future versions `DataFrame.to_latex` is expected to 
+            # utilisethe base implementation of `Styler.to_latex` for 
+            # formatting and rendering. The arguments signature may
+            # therefore change.
+            # It is recommended instead to use `DataFrame.style.to_latex`
+            # which also contains additional functionality.
+            # function_name = f'Styler.to_{file_type}'
+            file_functions.append(dataframe_to_use.style.to_latex)
+        else:
+            file_functions.append(getattr(dataframe_to_use, function_name))
 
     using_file_types = [
         dataframe_outputs[file_type] for file_type in file_types
