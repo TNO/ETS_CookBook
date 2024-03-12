@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: ETS_CookBook
-Version: 1.0.13
+Version: 1.0.14
 Summary: The ETS (TNO) CookBook of useful Python Scripts
 Author-email: Omar Usmani <Omar.Usmani@TNO.nl>
 Project-URL: Homepage, https://github.com/TNO/ETS_CookBook
@@ -212,7 +212,7 @@ to vertical
     countries you are using into ISOA3 codes, which can be found here
     https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3
 34. **make_quantity_map:** Makes one of the quantity maps in a map grid.
-35. **put_plots_on_map:88 Puts plots/axes on a map figure. You can then
+35. **put_plots_on_map:** Puts plots/axes on a map figure. You can then
 draw in these.
 
 ## Acknowledgements
