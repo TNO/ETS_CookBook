@@ -514,7 +514,7 @@ def save_dataframe(
 
     file_functions = []
     for file_type, is_groupfile in zip(file_types, is_groupfile_per_type):
-   
+
         # Some file formats require some extra processing, so
         # we need to forgo list compreshension and use
         # copies of the dataframe that we will modify
@@ -531,12 +531,12 @@ def save_dataframe(
             # These file formats have issues with some characters
             # in column and index names
             # Note that for xml, the names cannot start with the letters
-            # xaml (with all case variations) and must start with a letter 
+            # xaml (with all case variations) and must start with a letter
             # or underscore (replacement of such issues is not implemented
             # at the moment, so the function will fail unless you correct
             # that in your data).
             # Note that stata also has issues with too lonmg names
-            #  (>32 characters), but the to_stata function manages this on 
+            #  (>32 characters), but the to_stata function manages this on
             # its own (by cutting any excess characters). As such, this
             # does not need to be corrected here
             # We only do this if the user wants to use these file types,
@@ -545,10 +545,8 @@ def save_dataframe(
             # can still use column headers that aren't strings
             code_for_invalid_characters = '[^0-9a-zA-Z_.]'
 
-            dataframe_to_use.columns = (
-                dataframe_to_use.columns.str.replace(
-                    code_for_invalid_characters, '_', regex=True
-                )
+            dataframe_to_use.columns = dataframe_to_use.columns.str.replace(
+                code_for_invalid_characters, '_', regex=True
             )
 
             if dataframe_to_use.index.name:
@@ -569,8 +567,8 @@ def save_dataframe(
         function_name = f'to_{file_type}'
 
         if file_type == 'latex':
-            # In future versions `DataFrame.to_latex` is expected to 
-            # utilisethe base implementation of `Styler.to_latex` for 
+            # In future versions `DataFrame.to_latex` is expected to
+            # utilisethe base implementation of `Styler.to_latex` for
             # formatting and rendering. The arguments signature may
             # therefore change.
             # It is recommended instead to use `DataFrame.style.to_latex`
@@ -1523,7 +1521,11 @@ def map_grid(
 
 
 def put_plots_on_map(
-    map_figure, map_data, map_parameters, plot_y_total_values
+    map_figure,
+    map_data,
+    map_parameters,
+    plot_y_total_values,
+    projection_type=None,
 ):
     '''
     Puts plots/axes on a map figure. You can then draw in these.
@@ -1589,7 +1591,8 @@ def put_plots_on_map(
                     * (1 + latitude_scaling * latitude / maximum_latitude),
                     x_size,
                     y_size,
-                ]
+                ],
+                projection=projection_type
             )
     return plots_on_top
 
