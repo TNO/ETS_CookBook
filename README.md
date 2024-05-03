@@ -140,6 +140,10 @@ to vertical
 34. **make_quantity_map:** Makes one of the quantity maps in a map grid.
 35. **put_plots_on_map:** Puts plots/axes on a map figure. You can then
 draw in these.
+36. **rgba_code_color:**:Gets an RGBGA string from a color RGB tuple.
+    This is useful for plotly.
+    The A part os the color opacity.
+37. *make_sankey:**Makes a Sankey plot in plotly (comes out as an html file).
 
 ## Acknowledgements
 This CookBook has been developed within multiple projects,

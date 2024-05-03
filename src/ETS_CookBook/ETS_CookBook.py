@@ -74,6 +74,10 @@ to vertical
 34. **make_quantity_map:** Makes one of the quantity maps in a map grid.
 35. **put_plots_on_map:** Puts plots/axes on a map figure. You can then
 draw in these.
+36. **rgba_code_color:**:Gets an RGBGA string from a color RGB tuple.
+    This is useful for plotly.
+    The A part os the color opacity.
+37. *make_sankey:**Makes a Sankey plot in plotly (comes out as an html file).
 '''
 
 import datetime
@@ -94,6 +98,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import openpyxl
 import pandas as pd
+import plotly.graph_objects as go
 import requests
 import xarray as xr
 
@@ -1592,9 +1597,128 @@ def put_plots_on_map(
                     x_size,
                     y_size,
                 ],
-                projection=projection_type
+                projection=projection_type,
             )
     return plots_on_top
+
+
+def rgba_code_color(color_rgb, color_opacity):
+    '''
+    Gets an RGBGA string from a color RGB tuple.
+    This is useful for plotly.
+    The A part os the color opacity.
+    '''
+    rgba_string = (
+        f'rgba('
+        f'{color_rgb[0]},'
+        f'{color_rgb[1]},'
+        f'{color_rgb[2]},'
+        f'{color_opacity})'
+    )
+    return rgba_string
+
+
+def make_sankey(parameters):
+    '''
+    Makes a Sankey plot in plotly (comes out as an html file).
+    '''
+
+    node_parameters = parameters['Sankey']['nodes']
+    nodes_source_file = node_parameters['source_file']
+    nodes = pd.read_csv(nodes_source_file)
+
+    label_padding = node_parameters['label_padding']
+    label_alignement = node_parameters['label_alignement']
+
+    node_labels_names_only = pd.Series(nodes['Label'])
+    display_values = node_parameters['display_values']
+    if display_values:
+        values_to_add = nodes['Value']
+        unit = node_parameters['unit']
+        node_labels = []
+        for node_label, value_to_add in zip(
+            node_labels_names_only, values_to_add
+        ):
+            node_labels.append(f'{node_label}<br> {value_to_add}<br> {unit}')
+    else:
+        node_labels = node_labels_names_only
+
+    node_x_positions = nodes['X position']
+    node_y_positions = nodes['Y position']
+    node_colors = nodes['Color']
+    node_color_dict = dict(zip(node_labels_names_only, node_colors))
+    color_names = parameters['colors']
+
+    node_colors_rgba_codes = []
+    for node_color in node_colors:
+        color_opacity = 1
+        color_rgb = color_names[node_color]
+        node_colors_rgba_codes.append(
+            rgba_code_color(color_rgb, color_opacity)
+        )
+
+    link_parameters = parameters['Sankey']['links']
+    links_source_file = link_parameters['source_file']
+    links = pd.read_csv(links_source_file)
+    link_sources = links['Source']
+    link_source_indices = [
+        node_labels_names_only[node_labels_names_only == source].index[0]
+        for source in link_sources
+    ]
+
+    link_targets = links['Target']
+    link_target_indices = [
+        node_labels_names_only[node_labels_names_only == target].index[0]
+        for target in link_targets
+    ]
+    value_scaling_factor = link_parameters['value_scaling_factor']
+    link_values_unscaled = links['Value']
+    link_values = [
+        link_value / value_scaling_factor
+        for link_value in link_values_unscaled
+    ]
+    link_colors = links['Color']
+    link_opacities = links['Opacity']
+    link_labels = links['Label']
+    link_colors_rgba_codes = []
+    for link_color, link_opacity, source, target, link_label in zip(
+        link_colors,
+        link_opacities,
+        link_sources,
+        link_targets,
+        link_labels,
+    ):
+
+        if link_color == 'source':
+            link_color = node_color_dict[source]
+        elif link_color == 'target':
+            link_color = node_color_dict[target]
+
+        color_rgb = color_names[link_color]
+        link_colors_rgba_codes.append(rgba_code_color(color_rgb, link_opacity))
+
+    sankey_figure = go.Figure(
+        go.Sankey(
+            # arrangement='snap',
+            node=dict(
+                label=node_labels,
+                x=node_x_positions,
+                y=node_y_positions,
+                color=node_colors_rgba_codes,
+                pad=label_padding,
+                align=label_alignement,
+            ),
+            link=dict(
+                source=link_source_indices,
+                target=link_target_indices,
+                value=link_values,
+                color=link_colors_rgba_codes,
+                label=link_labels,
+            ),
+        )
+    )
+
+    sankey_figure.show()
 
 
 if __name__ == '__main__':

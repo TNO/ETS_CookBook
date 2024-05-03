@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: ETS_CookBook
-Version: 1.0.16
+Version: 1.0.18
 Summary: The ETS (TNO) CookBook of useful Python Scripts
 Author-email: Omar Usmani <Omar.Usmani@TNO.nl>
 Project-URL: Homepage, https://github.com/TNO/ETS_CookBook
@@ -51,6 +51,7 @@ Requires-Dist: pandas==2.0.1
 Requires-Dist: pathspec==0.12.1
 Requires-Dist: Pillow==10.0.0
 Requires-Dist: platformdirs==4.1.0
+Requires-Dist: plotly==5.22.0
 Requires-Dist: py-cpuinfo==9.0.0
 Requires-Dist: pyarrow==12.0.1
 Requires-Dist: pycodestyle==2.11.0
@@ -66,6 +67,7 @@ Requires-Dist: shapely==2.0.1
 Requires-Dist: six==1.16.0
 Requires-Dist: soupsieve==2.4.1
 Requires-Dist: tables==3.8.0
+Requires-Dist: tenacity==8.2.3
 Requires-Dist: tqdm==4.65.0
 Requires-Dist: typing_extensions==4.9.0
 Requires-Dist: tzdata==2023.3
@@ -214,6 +216,10 @@ to vertical
 34. **make_quantity_map:** Makes one of the quantity maps in a map grid.
 35. **put_plots_on_map:** Puts plots/axes on a map figure. You can then
 draw in these.
+36. **rgba_code_color:**:Gets an RGBGA string from a color RGB tuple.
+    This is useful for plotly.
+    The A part os the color opacity.
+37. *make_sankey:**Makes a Sankey plot in plotly (comes out as an html file).
 
 ## Acknowledgements
 This CookBook has been developed within multiple projects,
