@@ -1618,14 +1618,19 @@ def rgba_code_color(color_rgb, color_opacity):
     return rgba_string
 
 
-def make_sankey(sankey_title, output_folder, parameters):
+def make_sankey(
+    nodes,
+    links,
+    sankey_title,
+    output_folder,
+    parameters,
+):
     '''
     Makes a Sankey plot in plotly (comes out as an html file).
+    The nodes and links are in a DataFrame
     '''
 
     node_parameters = parameters['Sankey']['nodes']
-    nodes_source_file = node_parameters['source_file']
-    nodes = pd.read_csv(nodes_source_file)
 
     label_padding = node_parameters['label_padding']
     label_alignement = node_parameters['label_alignement']
@@ -1658,8 +1663,7 @@ def make_sankey(sankey_title, output_folder, parameters):
         )
 
     link_parameters = parameters['Sankey']['links']
-    links_source_file = link_parameters['source_file']
-    links = pd.read_csv(links_source_file)
+
     link_sources = links['Source']
     link_source_indices = [
         node_labels_names_only[node_labels_names_only == source].index[0]
