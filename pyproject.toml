@@ -6,7 +6,7 @@ build-backend = 'setuptools.build_meta'
 
 [project]
 name = 'ETS_CookBook'
-version = '1.0.18'
+version = '1.0.19'
 authors = [
   { name='Omar Usmani', email='Omar.Usmani@TNO.nl' },
 ]

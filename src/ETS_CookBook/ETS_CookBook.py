@@ -1618,7 +1618,7 @@ def rgba_code_color(color_rgb, color_opacity):
     return rgba_string
 
 
-def make_sankey(parameters):
+def make_sankey(sankey_title, output_folder, parameters):
     '''
     Makes a Sankey plot in plotly (comes out as an html file).
     '''
@@ -1717,8 +1717,16 @@ def make_sankey(parameters):
             ),
         )
     )
-
-    sankey_figure.show()
+    title_size = parameters['Sankey']['title_size']
+    sankey_figure.update_layout(
+        title=dict(
+            text=f'{sankey_title}',
+            font=dict(size=title_size),
+            automargin=True,
+            yref='container',
+        )
+    )
+    sankey_figure.write_html(f'{output_folder}/{sankey_title}.html')
 
 
 if __name__ == '__main__':
