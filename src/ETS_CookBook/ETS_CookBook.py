@@ -170,15 +170,21 @@ def reference_scale(number_list: 'list[float]', digit_shift: int = 0):
     return [lower_scale, upper_scale]
 
 
-def dataframe_from_Excel_table_name(table_name, Excel_file):
+def dataframe_from_Excel_table_name(
+    table_name, Excel_file, load_data_only=True
+):
     '''
     This function looks up a given table name in an Excel file
     and returns a DataFrame containing the values of that table.
     Note that if the name does not exist (or is spelled wrongly (it's
     case-sensitive), the function will crash).
+    The optional load_data_only parameter puts values in the table if set to
+    True (its default value. A False value loads formulas)
     '''
 
-    source_workbook = openpyxl.load_workbook(Excel_file)
+    source_workbook = openpyxl.load_workbook(
+        Excel_file, data_only=load_data_only
+    )
 
     # We need to look up the worksheet
     # table_worksheet = ''
