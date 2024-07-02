@@ -103,7 +103,7 @@ import requests
 import xarray as xr
 
 
-def check_if_folder_exists(folder_to_check):
+def check_if_folder_exists(folder_to_check: str) -> None:
     '''
     Checks if a folder exists. If it does not, it creates it.
     This way, users can setup a new (sub-)folder in the configuration file
@@ -116,7 +116,7 @@ def check_if_folder_exists(folder_to_check):
         os.makedirs(folder_to_check)
 
 
-def parameters_from_TOML(parameters_file_name):
+def parameters_from_TOML(parameters_file_name: str) -> dict:
     '''
     Reads a TOML parameters file name and returns a parameters
     dictionary.
@@ -128,7 +128,9 @@ def parameters_from_TOML(parameters_file_name):
     return parameters
 
 
-def reference_scale(number_list: 'list[float]', digit_shift: int = 0):
+def reference_scale(
+    number_list: 'list[float]', digit_shift: int = 0
+) -> list[float]:
     '''
     This function takes a list of numbers an returns a scale
     (lower and upper boundary) they are in.
@@ -1742,6 +1744,7 @@ def make_sankey(
 if __name__ == '__main__':
 
     woo = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
+    ttt = parameters_from_TOML(666)
     print(woo)
     exit()
     series_label = 'SFC'
