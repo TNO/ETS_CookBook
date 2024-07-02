@@ -155,19 +155,13 @@ def reference_scale(
 
     dividers = [math.pow(10, power) for power in boundary_powers_of_ten]
 
-    if dividers[0] == 0:
-        lower_scale = 0
-    else:
-        lower_scale = (
-            math.floor((number_list_boundaries[0]) / dividers[0]) * dividers[0]
-        )
+    lower_scale = (
+        math.floor((number_list_boundaries[0]) / dividers[0]) * dividers[0]
+    )
 
-    if dividers[1] == 0:
-        upper_scale = 0
-    else:
-        upper_scale = (
-            math.ceil((number_list_boundaries[1]) / dividers[1]) * dividers[1]
-        )
+    upper_scale = (
+        math.ceil((number_list_boundaries[1]) / dividers[1]) * dividers[1]
+    )
 
     return [lower_scale, upper_scale]
 
@@ -1743,6 +1737,9 @@ def make_sankey(
 
 if __name__ == '__main__':
 
+    noom = [1e300, 2.1, 10.1]
+    print(reference_scale(noom, 1))
+    
     woo = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
     ttt = parameters_from_TOML(666)
     print(woo)
