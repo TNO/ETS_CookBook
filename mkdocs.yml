@@ -2,11 +2,8 @@ site_name: ChaProEV
 nav:
  - Home: index.md
  - How to use: using.md
- - Files: 
- - Dataframes/pandas:
- - 
  - Plotting:
-            - Math: math.md
-            - Physics: physics.md
+            - make_spider_chart: make_spider_chart.md
+
 
 theme: readthedocs
