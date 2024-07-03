@@ -51,6 +51,9 @@ This cookbook is released under the Apache 2.0 licence.
 All accompanying documentation and manual are released under the 
 Creative Commons BY-SA 4.0 license.
 
+# Documentation
+The documentation can be found here:
+https://tno.github.io/ETS_CookBook/
 
 ## Status
 This CookBook is a working version that will be updated with new functions
