@@ -85,6 +85,10 @@ import math
 import os
 import sqlite3
 import zipfile
+from typing import Any, Literal
+
+import matplotlib.axes
+import matplotlib.figure
 
 try:
     import tomllib
@@ -129,7 +133,7 @@ def parameters_from_TOML(parameters_file_name: str) -> dict:
 
 
 def reference_scale(
-    number_list: 'list[float]', digit_shift: int = 0
+    number_list: list[float], digit_shift: int = 0
 ) -> list[float]:
     '''
     This function takes a list of numbers an returns a scale
@@ -167,8 +171,8 @@ def reference_scale(
 
 
 def dataframe_from_Excel_table_name(
-    table_name, Excel_file, load_data_only=True
-):
+    table_name: str, Excel_file: str, load_data_only: bool = True
+) -> pd.DataFrame:
     '''
     This function looks up a given table name in an Excel file
     and returns a DataFrame containing the values of that table.
@@ -213,7 +217,9 @@ def dataframe_from_Excel_table_name(
     return table_dataframe
 
 
-def dataframe_to_Excel(dataframe_to_append, Excel_workbook, my_sheet):
+def dataframe_to_Excel(
+    dataframe_to_append: pd.DataFrame, Excel_workbook: str, my_sheet: str
+) -> None:
     '''
     This function takes a DataFrame and puts it into a new sheet in
     an Excel workbook. If the sheet already exists, it will replace it.
@@ -230,7 +236,7 @@ def dataframe_to_Excel(dataframe_to_append, Excel_workbook, my_sheet):
         dataframe_to_append.to_excel(writer, sheet_name=my_sheet)
 
 
-def get_extra_colors(parameters):
+def get_extra_colors(parameters: dict) -> pd.DataFrame:
     '''
     This function gets the user-defined extra colors from a file.
     This file contains the names of the colors, and their RGB values
@@ -248,7 +254,7 @@ def get_extra_colors(parameters):
     return extra_colors
 
 
-def get_rgb_from_name(color_name, parameters):
+def get_rgb_from_name(color_name: str, parameters: dict) -> list[float]:
     '''
     This function takes a color name and returns its RGB values (0 to 1).
     If the color name is in the extra colors, then, we use
@@ -258,12 +264,14 @@ def get_rgb_from_name(color_name, parameters):
     extra_colors = get_extra_colors(parameters)
 
     if color_name in extra_colors.index.values:
-        return extra_colors.loc[color_name].values
+        return list(extra_colors.loc[color_name].values)
     else:
-        return matplotlib.colors.to_rgb(color_name)
+        return list(matplotlib.colors.to_rgb(color_name))
 
 
-def rgb_color_list(color_names, parameters):
+def rgb_color_list(
+    color_names: list[str], parameters: dict
+) -> list[list[float]]:
     '''
     Gets a list of RGB codes for a list of color names.
     '''
@@ -274,7 +282,7 @@ def rgb_color_list(color_names, parameters):
     return rgb_codes
 
 
-def register_color_bars(parameters):
+def register_color_bars(parameters: dict) -> None:
     '''
     This function reads the user-defined color bars in a parameter file
     (names for the bars, and a list of the colors they contain, with the
@@ -286,7 +294,7 @@ def register_color_bars(parameters):
     color_bars = parameters['color_bars']
 
     # This dictionary stores the dictionaries for each color bar
-    color_bar_dictionary = {}
+    color_bar_dictionary: dict = {}
     # These colors are the three base keys of each bar color dictionary
     # Each dictionary contains a tuple of tuples for each base colors
     # Each of these sub-tuples cotains a step (between 0 and 1),
@@ -353,7 +361,7 @@ def register_color_bars(parameters):
             matplotlib.colormaps.register(color_bar_to_register)
 
 
-def get_season(time_stamp):
+def get_season(time_stamp: datetime.datetime) -> str:
     '''
     This function takes a datetime timestamp and tells us in which season
     it is.
@@ -403,10 +411,16 @@ def get_season(time_stamp):
     ]
     for season, (start, end) in seasons:
         if start <= date <= end:
-            return season
+            result_season = season
+    return result_season
 
 
-def save_figure(figure, figure_name, output_folder, parameters):
+def save_figure(
+    figure: matplotlib.figure.Figure,
+    figure_name: str,
+    output_folder: str,
+    parameters: dict,
+) -> None:
     '''
     This function saves a Matplolib figure to a number of
     file formats and an output folder that are all specified in a
@@ -427,8 +441,12 @@ def save_figure(figure, figure_name, output_folder, parameters):
 
 
 def save_dataframe(
-    dataframe, dataframe_name, groupfile_name, output_folder, parameters
-):
+    dataframe: pd.DataFrame,
+    dataframe_name: str,
+    groupfile_name: str,
+    output_folder: str,
+    parameters: dict,
+) -> None:
     '''
     This function saves a pandas dataframe to a number of
     file formats and an output folder that are all specified in a
@@ -519,7 +537,7 @@ def save_dataframe(
         True,
     ]
 
-    file_functions = []
+    file_functions: list[function] = []
     for file_type, is_groupfile in zip(file_types, is_groupfile_per_type):
 
         # Some file formats require some extra processing, so
@@ -649,12 +667,12 @@ def save_dataframe(
 
 
 def put_dataframe_in_sql_in_chunks(
-    source_dataframe,
-    sql_file,
-    table_name,
-    chunk_size,
-    drop_existing_table=True,
-):
+    source_dataframe: pd.DataFrame,
+    sql_file: str,
+    table_name: str,
+    chunk_size: int,
+    drop_existing_table: bool = True,
+) -> None:
     '''
     This function takes a Dataframe and writes it into the table
     of an SQL database. It does so in chunks to avoid memory issues.
@@ -672,7 +690,7 @@ def put_dataframe_in_sql_in_chunks(
 
     with sqlite3.connect(sql_file) as sql_connection:
         if drop_existing_table:
-            table_action = 'replace'
+            table_action: Literal['fail', 'replace', 'append'] = 'replace'
         else:
             table_action = 'append'
 
@@ -691,7 +709,7 @@ def put_dataframe_in_sql_in_chunks(
             table_action = 'append'
 
 
-def query_list_from_file(sql_file):
+def query_list_from_file(sql_file: str) -> list[str]:
     '''
     This returns a list of queries from an SQL file
     '''
@@ -703,7 +721,9 @@ def query_list_from_file(sql_file):
     return sql_queries
 
 
-def dataframes_from_query_list(query_list, sql_connection):
+def dataframes_from_query_list(
+    query_list: list[str], sql_connection: sqlite3.Connection
+) -> list[pd.DataFrame]:
     '''
     This returns a list of dataframes, each obtained from a query in the list
     '''
@@ -714,7 +734,7 @@ def dataframes_from_query_list(query_list, sql_connection):
     return dataframe_list
 
 
-def from_grib_to_dataframe(grib_file):
+def from_grib_to_dataframe(grib_file: str) -> pd.DataFrame:
     '''
     This function takes a grib file and converts it to a DataFrame.
     **Important note:**
@@ -732,12 +752,12 @@ def from_grib_to_dataframe(grib_file):
 
 
 def read_query_generator(
-    quantities_to_display,
-    source_table,
-    query_filter_quantities,
-    query_filter_types,
-    query_filter_values,
-):
+    quantities_to_display: str,
+    source_table: str,
+    query_filter_quantities: list[str],
+    query_filter_types: list[str],
+    query_filter_values: list[str],
+) -> str:
     '''
     This function returns an sql read/select query string that can be used
     (for example) in Panda's read_sql.
@@ -800,7 +820,7 @@ def read_query_generator(
     return output_query
 
 
-def database_tables_columns(database):
+def database_tables_columns(database: str) -> dict:
     '''
     Returns a dictionary with the tables of a database as keys and their
     columns as values.
@@ -824,7 +844,7 @@ def database_tables_columns(database):
     return tables_columns
 
 
-def download_and_save_file(download_url, output_folder):
+def download_and_save_file(download_url: str, output_folder: str) -> None:
     '''
     Downloads a file from an URL and saves it. If the file is a zip file,
     the function extracts its contents.
@@ -841,7 +861,7 @@ def download_and_save_file(download_url, output_folder):
             zip_data.extract(zip_info, path=output_folder)
 
 
-def string_to_float(my_string):
+def string_to_float(my_string: str) -> float:
     '''
     Converts strings to floats, and to zero if the string is not a float.
     '''
@@ -853,7 +873,7 @@ def string_to_float(my_string):
     return my_output
 
 
-def get_map_area_data(parameters):
+def get_map_area_data(parameters: dict) -> pd.DataFrame:
     '''
     This function gets and processes the area data and sets it
     into a DataFrame. It contains polygons/multipolygons
@@ -881,7 +901,7 @@ def get_map_area_data(parameters):
     return area_data
 
 
-def get_map_borders(NUTS_level, parameters):
+def get_map_borders(NUTS_level: int, parameters: dict) -> pd.DataFrame:
     '''
     This function gets the borders/contours of regions at a specified NUTS
     level.
@@ -900,7 +920,7 @@ def get_map_borders(NUTS_level, parameters):
     return border_data
 
 
-def get_map_points(NUTS_level, parameters):
+def get_map_points(NUTS_level: int, parameters: dict) -> pd.DataFrame:
     '''
     This function gets the points/labels of regions at a specified NUTS
     level.
@@ -920,51 +940,59 @@ def get_map_points(NUTS_level, parameters):
 
 
 def make_spider_chart(
-    spider_plot,
-    series_label,
-    data_labels,
-    data_values,
-    markers,
-    marker_labels,
-    spider_color,
-    spider_marker,
-    spider_linewidth,
-    spider_alpha,
-):
+    spider_plot: matplotlib.axes.Axes,
+    series_label: str,
+    data_labels: list[str],
+    data_values: list[list[float]],
+    markers: list[str],
+    marker_labels: list[str],
+    spider_color: str,
+    spider_marker: str,
+    spider_linewidth: float,
+    spider_alpha: float,
+) -> matplotlib.axes.Axes:
     angles = np.linspace(0, 2 * np.pi, len(data_labels), endpoint=False)
 
-    angles = np.concatenate((angles, [angles[0]]))
-    data_labels = np.concatenate((data_labels, [data_labels[0]]))
-    data_values = np.concatenate((data_values, [data_values[0]]))
+    angles_for_plot = np.concatenate((angles, [angles[0]]))
+    data_labels_for_plot = np.concatenate((data_labels, [data_labels[0]]))
+    data_values_for_plot = np.concatenate((data_values, [data_values[0]]))
+    print(angles_for_plot)
+    print(angles)
+    print(data_labels_for_plot)
 
+    
     spider_plot.plot(
-        angles,
+        angles_for_plot,
         data_values,
         marker=spider_marker,
         linewidth=spider_linewidth,
         color=spider_color,
         label=series_label,
     )
+    
     spider_plot.fill(
-        angles, data_values, alpha=spider_alpha, color=spider_color
+        angles_for_plot, data_values, alpha=spider_alpha, color=spider_color
     )
-    spider_plot.set_thetagrids(angles * 180 / np.pi, data_labels)
+    
+    spider_plot.set_thetagrids(
+        angles_for_plot * 180 / np.pi, data_labels_for_plot
+    )
     spider_plot.set_yticks(markers)
     spider_plot.set_yticklabels(marker_labels)
     spider_plot.legend()
-
+    
     return spider_plot
 
 
 def update_database_table(
-    database_to_update,
-    table_to_update,
-    columns_to_update,
-    new_values,
-    query_filter_quantities,
-    query_filter_types,
-    query_filter_values,
-):
+    database_to_update: str,
+    table_to_update: str,
+    columns_to_update: list[str],
+    new_values: list[Any],
+    query_filter_quantities: list[str],
+    query_filter_types: list[str],
+    query_filter_values: list[str],
+) -> None:
     '''
     This function updates the values
     of one row of a table in a database.
@@ -1034,8 +1062,10 @@ def update_database_table(
 
 
 def make_query_filter(
-    query_filter_quantities, query_filter_types, query_filter_values
-):
+    query_filter_quantities: list[str],
+    query_filter_types: list[str],
+    query_filter_values: list[str],
+) -> str:
     '''
     Returns a query filter stringthat can be used in an SQL query.
      The input parameters are:
@@ -1098,8 +1128,11 @@ def make_query_filter(
                     f'{filter_value[0]},{filter_value[1]})'
                 )
             else:
-                filter_value = [f'{my_value}' for my_value in filter_value]
-                filter_value = ','.join(filter_value)
+                # To make a string with commas, we go through a list
+                filter_value_list = [
+                    f'{my_value}' for my_value in filter_value
+                ]
+                filter_value = ','.join(filter_value_list)
                 query_filter = (
                     f'{query_filter} {filter_quantity} ' f'in ({filter_value})'
                 )
@@ -1113,7 +1146,9 @@ def make_query_filter(
     return query_filter
 
 
-def read_table_from_database(table_name, database_file):
+def read_table_from_database(
+    table_name: str, database_file: str
+) -> pd.DataFrame:
     '''
     Reads a table from an sqlite3 database and retruns it as a
     dataframe
@@ -1127,17 +1162,17 @@ def read_table_from_database(table_name, database_file):
 
 
 def put_dataframe_in_word_document(
-    dataframe_to_put,
-    word_document_name,
-    number_formats=['.2f'],
-    table_style='Normal Table',
-    empty_code='',
-    cell_font_size=11,
-    headers_font_size=11,
-    merge_headers=True,
-    flip_merged_rows=True,
-    bottom_to_top=True,
-):
+    dataframe_to_put: pd.DataFrame,
+    word_document_name: str,
+    number_formats: list[str] = ['.2f'],
+    table_style: str = 'Normal Table',
+    empty_code: str = '',
+    cell_font_size: int = 11,
+    headers_font_size: int = 11,
+    merge_headers: bool = True,
+    flip_merged_rows: bool = True,
+    bottom_to_top: bool = True,
+) -> None:
     '''
     This function puts a Dataframe into a given Word document.
     If the document does not exist, it is created.
@@ -1300,7 +1335,9 @@ def put_dataframe_in_word_document(
     target_document.save(word_document_name)
 
 
-def make_cell_text_vertical(cell, bottom_to_top=True):
+def make_cell_text_vertical(
+    cell: docx.table._Cell, bottom_to_top: bool = True
+):
     '''
     Changes the orientation of a Word table cell to vertical,
     with the option to get text from bottom to top (default)
@@ -1324,7 +1361,7 @@ def make_cell_text_vertical(cell, bottom_to_top=True):
     cell_properties.append(textDirection)
 
 
-def delete_word_element(element_reference):
+def delete_word_element(element_reference) -> None:
     '''
     Deletes a give element in a Word document.
     '''
@@ -1332,7 +1369,7 @@ def delete_word_element(element_reference):
     element.getparent().remove(element)
 
 
-def clear_word_document(document_file_name):
+def clear_word_document(document_file_name: str) -> None:
     '''
     Clears a Word document of its elements
     (text/paragraphs, tables, pictures.)
@@ -1350,7 +1387,7 @@ def clear_word_document(document_file_name):
     target_document.save(document_file_name)
 
 
-def get_rgb_255_code_string(color_name, parameters):
+def get_rgb_255_code_string(color_name: str, parameters: dict) -> str:
     '''
     Creates a string with rgb values (0-255),
     rgb(111, 233, 66)
@@ -1359,21 +1396,21 @@ def get_rgb_255_code_string(color_name, parameters):
     # We convert the color name to an RGB (0-255)
     rgb_255 = 255 * get_rgb_from_name(color_name, parameters)
     # We make it a string (and remove the 0 decimal via int conversion)
-    rgb_255 = list(map(str, map(int, rgb_255)))
-    rgb_255_code_string = f'({", ".join(rgb_255)})'
+    rgb_255_string = list(map(str, map(int, rgb_255)))
+    rgb_255_code_string = f'({", ".join(rgb_255_string)})'
 
     return rgb_255_code_string
 
 
 def make_quantity_map(
-    quantity_display_name,
-    plot_data,
-    map_areas,
-    quantity_plot,
-    quantity_color,
-    map_grid_plot_parameters,
-    parameters,
-):
+    quantity_display_name: str,
+    plot_data: pd.DataFrame,
+    map_areas: pd.DataFrame,
+    quantity_plot: matplotlib.axes.Axes,
+    quantity_color: str,
+    map_grid_plot_parameters: dict,
+    parameters: dict,
+) -> None:
     '''
     Makes one of the quantity maps in a map grid.
     '''
@@ -1432,8 +1469,11 @@ def make_quantity_map(
 
 
 def map_grid(
-    quantities_data, quantity_display_names, quantity_colors, parameters
-):
+    quantities_data: list[pd.DataFrame],
+    quantity_display_names: list[str],
+    quantity_colors: list[str],
+    parameters: dict,
+) -> None:
     '''
     This function creates a grid of maps. You need to give it the data you want
     to plot, the names of the quantities, and their colors, as well as
@@ -1528,12 +1568,12 @@ def map_grid(
 
 
 def put_plots_on_map(
-    map_figure,
-    map_data,
-    map_parameters,
-    plot_y_total_values,
-    projection_type=None,
-):
+    map_figure: matplotlib.figure.Figure,
+    map_data: pd.DataFrame,
+    map_parameters: dict,
+    plot_y_total_values: pd.DataFrame,
+    projection_type: str | None = None,
+) -> dict[str, matplotlib.axes.Axes]:
     '''
     Puts plots/axes on a map figure. You can then draw in these.
     The plot_y_total_values are the sizes of the plots per country (for example
@@ -1577,7 +1617,7 @@ def put_plots_on_map(
 
     # We create a dictionary that contains a plot/axis on top for each
     # location
-    plots_on_top = {}
+    plots_on_top: dict[str, matplotlib.axes.Axes] = {}
 
     # We iterate through the locations
     for location in map_data.index:
@@ -1604,7 +1644,9 @@ def put_plots_on_map(
     return plots_on_top
 
 
-def rgba_code_color(color_rgb, color_opacity):
+def rgba_code_color(
+    color_rgb: tuple[int, int, int], color_opacity: float
+) -> str:
     '''
     Gets an RGBGA string from a color RGB tuple.
     This is useful for plotly.
@@ -1621,12 +1663,12 @@ def rgba_code_color(color_rgb, color_opacity):
 
 
 def make_sankey(
-    nodes,
-    links,
-    sankey_title,
-    output_folder,
-    parameters,
-):
+    nodes: dict,
+    links: dict,
+    sankey_title: str,
+    output_folder: str,
+    parameters: dict,
+) -> None:
     '''
     Makes a Sankey plot in plotly (comes out as an html file).
     The nodes and links are in a DataFrame
@@ -1737,15 +1779,25 @@ def make_sankey(
 
 if __name__ == '__main__':
 
-    noom = [1e300, 2.1, 10.1]
-    print(reference_scale(noom, 1))
-    
-    woo = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
-    ttt = parameters_from_TOML(666)
-    print(woo)
-    exit()
+    # parameters_file_name = 'test.toml'
+    # parameters = parameters_from_TOML(parameters_file_name)
+    # extra_colors = get_extra_colors(parameters)
+    # print(type(get_rgb_from_name('TNO_ink', parameters)))
+    # print(type(get_rgb_from_name('dodgerblue', parameters)))
+    # print(extra_colors.loc['TNO_ink'].values)
+    # # noom = [1e300, 2.1, 10.1](parametrs)
+    # # print(reference_scale(noom, 1))
+
+    # # woo = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
+    # print(type(rgb_color_list(['TNO_ink'], parameters)))
+
+    # moo = datetime.datetime(2020, 5, 8)
+    # print(moo)
+    # print(type(moo))
+    # print(type(get_rgb_from_name))
+    # exit()
     series_label = 'SFC'
-    data_values = [-6, 0, 0.26, 0.42, 0.89, 0.77, 0.66]
+    data_values = [6, 0, 0.26, 0.42, 0.89, 0.77, 1]
     data_labels = ['Mango', 'Mapo', 'Lacrosse', 'Floorball', 'Switch', 'NDS']
     markers = [0, 0.25, 0.50, 0.75, 1.0]
     marker_labels = ['0%', '25%', '50%', '75%', '100%']
@@ -1768,6 +1820,8 @@ if __name__ == '__main__':
         spider_linewidth,
         spider_alpha,
     )
+    plt.show()
+    exit()
     spider_color = 'dodgerblue'
     series_label = 'GSHC'
     data_values = [0.52, 0.18, 0.29, 0.39, 0.66, 0.42]
