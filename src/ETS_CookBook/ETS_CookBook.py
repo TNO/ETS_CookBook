@@ -89,6 +89,7 @@ from typing import Any, Literal
 
 import matplotlib.axes
 import matplotlib.figure
+import matplotlib.projections
 
 try:
     import tomllib
@@ -940,25 +941,28 @@ def get_map_points(NUTS_level: int, parameters: dict) -> pd.DataFrame:
 
 
 def make_spider_chart(
-    spider_plot: matplotlib.axes.Axes,
+    spider_plot: matplotlib.projections.polar.PolarAxes,
     series_label: str,
     data_labels: list[str],
-    data_values: list[list[float]],
-    markers: list[str],
+    data_values: list[float],
+    markers: list[float],
     marker_labels: list[str],
     spider_color: str,
     spider_marker: str,
     spider_linewidth: float,
     spider_alpha: float,
-) -> matplotlib.axes.Axes:
+) -> matplotlib.projections.polar.PolarAxes:
+    ''' '''
     angles = np.linspace(0, 2 * np.pi, len(data_labels), endpoint=False)
 
     # We first want to plot the contour of the spider.
     # We repeat the first value at the end, since we want to close the
     # contour.
     angles_for_contour = np.concatenate((angles, [angles[0]]))
-    data_labels_for_contour = np.concatenate((data_labels, [data_labels[0]]))
-    data_values_for_contour = np.concatenate((data_values, [data_values[0]]))
+    # data_labels_for_contour = np.concatenate((data_labels, [data_labels[0]]))
+    data_values_for_contour = list(
+        np.concatenate((data_values, [data_values[0]]))
+    )
 
     spider_plot.plot(
         angles_for_contour,
@@ -1805,6 +1809,15 @@ if __name__ == '__main__':
 
     spider_figure = plt.figure()
     spider_plot = spider_figure.add_subplot(111, polar=True)
+    # matplotlib says this should create an Axes, but it actually creates
+    # a PolarAxes (which has the attribute set_thetagrids used in the function
+    # This sets an issue with MyPy, who thinks that this is an Axes at first
+    # because this is what add_subplot says.
+    # We might avoid the issue by using two variables, but that might create
+    # issues when plotting several spiders on top of each other,
+    # so the warning remains (until matplotlib also puts PolarAxes as a
+    # possible output type)
+
     spider_alpha = 0.26
     spider_plot = make_spider_chart(
         spider_plot,
