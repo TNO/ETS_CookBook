@@ -953,34 +953,32 @@ def make_spider_chart(
 ) -> matplotlib.axes.Axes:
     angles = np.linspace(0, 2 * np.pi, len(data_labels), endpoint=False)
 
-    angles_for_plot = np.concatenate((angles, [angles[0]]))
-    data_labels_for_plot = np.concatenate((data_labels, [data_labels[0]]))
-    data_values_for_plot = np.concatenate((data_values, [data_values[0]]))
-    print(angles_for_plot)
-    print(angles)
-    print(data_labels_for_plot)
+    # We first want to plot the contour of the spider.
+    # We repeat the first value at the end, since we want to close the
+    # contour.
+    angles_for_contour = np.concatenate((angles, [angles[0]]))
+    data_labels_for_contour = np.concatenate((data_labels, [data_labels[0]]))
+    data_values_for_contour = np.concatenate((data_values, [data_values[0]]))
 
-    
     spider_plot.plot(
-        angles_for_plot,
-        data_values,
+        angles_for_contour,
+        data_values_for_contour,
         marker=spider_marker,
         linewidth=spider_linewidth,
         color=spider_color,
         label=series_label,
     )
-    
+
+    # For the fill, we use the original lists of angles and values
     spider_plot.fill(
-        angles_for_plot, data_values, alpha=spider_alpha, color=spider_color
+        angles, data_values, alpha=spider_alpha, color=spider_color
     )
-    
-    spider_plot.set_thetagrids(
-        angles_for_plot * 180 / np.pi, data_labels_for_plot
-    )
+
+    spider_plot.set_thetagrids(angles * 180 / np.pi, data_labels)
     spider_plot.set_yticks(markers)
     spider_plot.set_yticklabels(marker_labels)
     spider_plot.legend()
-    
+
     return spider_plot
 
 
@@ -1797,7 +1795,7 @@ if __name__ == '__main__':
     # print(type(get_rgb_from_name))
     # exit()
     series_label = 'SFC'
-    data_values = [6, 0, 0.26, 0.42, 0.89, 0.77, 1]
+    data_values = [0.6, 0, 0.26, 0.42, 0.89, 0.77]
     data_labels = ['Mango', 'Mapo', 'Lacrosse', 'Floorball', 'Switch', 'NDS']
     markers = [0, 0.25, 0.50, 0.75, 1.0]
     marker_labels = ['0%', '25%', '50%', '75%', '100%']
@@ -1820,8 +1818,7 @@ if __name__ == '__main__':
         spider_linewidth,
         spider_alpha,
     )
-    plt.show()
-    exit()
+
     spider_color = 'dodgerblue'
     series_label = 'GSHC'
     data_values = [0.52, 0.18, 0.29, 0.39, 0.66, 0.42]
