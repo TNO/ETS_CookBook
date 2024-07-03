@@ -958,7 +958,7 @@ def make_spider_chart(
     # We first want to plot the contour of the spider.
     # We repeat the first value at the end, since we want to close the
     # contour.
-    angles_for_contour = np.concatenate((angles, [angles[0]]))
+    angles_for_contour: np.ndarray = np.concatenate((angles, [angles[0]]))
     # data_labels_for_contour = np.concatenate((data_labels, [data_labels[0]]))
     data_values_for_contour = list(
         np.concatenate((data_values, [data_values[0]]))
@@ -1798,6 +1798,7 @@ if __name__ == '__main__':
     # print(type(moo))
     # print(type(get_rgb_from_name))
     # exit()
+
     series_label = 'SFC'
     data_values = [0.6, 0, 0.26, 0.42, 0.89, 0.77]
     data_labels = ['Mango', 'Mapo', 'Lacrosse', 'Floorball', 'Switch', 'NDS']
