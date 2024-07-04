@@ -953,8 +953,8 @@ def make_spider_chart(
     spider_alpha: float,
 ) -> matplotlib.projections.polar.PolarAxes:
     '''
-    This function draws a spider chart on a plot (Axes) for a given series
-    of data (with values, labels, and formats).
+    This function draws a spider/radar chart on a plot (Axes) for a given
+    series of data (with values, labels, and formats).
     '''
     angles = np.linspace(0, 2 * np.pi, len(data_labels), endpoint=False)
 
@@ -1784,71 +1784,6 @@ def make_sankey(
 
 if __name__ == '__main__':
 
-    # parameters_file_name = 'test.toml'
-    # parameters = parameters_from_TOML(parameters_file_name)
-    # extra_colors = get_extra_colors(parameters)
-    # print(type(get_rgb_from_name('TNO_ink', parameters)))
-    # print(type(get_rgb_from_name('dodgerblue', parameters)))
-    # print(extra_colors.loc['TNO_ink'].values)
-    # # noom = [1e300, 2.1, 10.1](parametrs)
-    # # print(reference_scale(noom, 1))
-
-    # # woo = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
-    # print(type(rgb_color_list(['TNO_ink'], parameters)))
-
-    # moo = datetime.datetime(2020, 5, 8)
-    # print(moo)
-    # print(type(moo))
-    # print(type(get_rgb_from_name))
-    # exit()
-
-    series_label = 'SFC'
-    data_values = [0.6, 0, 0.26, 0.42, 0.89, 0.77]
-    data_labels = ['Mango', 'Mapo', 'Lacrosse', 'Floorball', 'Switch', 'NDS']
-    ticks = [0, 0.25, 0.50, 0.75, 1.0]
-    tick_labels = ['0%', '25%', '50%', '75%', '100%']
-    spider_color = 'fuchsia'
-    spider_marker = 'o'
-    spider_linewidth = 2
-
-    spider_figure = plt.figure()
-    spider_plot = spider_figure.add_subplot(111, polar=True)
-    # matplotlib says this should create an Axes, but it actually creates
-    # a PolarAxes (which has the attribute set_thetagrids used in the function
-    # This sets an issue with MyPy, who thinks that this is an Axes at first
-    # because this is what add_subplot says.
-    # We might avoid the issue by using two variables, but that might create
-    # issues when plotting several spiders on top of each other,
-    # so the warning remains (until matplotlib also puts PolarAxes as a
-    # possible output type)
-
-    spider_alpha = 0.26
-    spider_plot = make_spider_chart(
-        spider_plot,
-        series_label,
-        data_labels,
-        data_values,
-        ticks,
-        tick_labels,
-        spider_color,
-        spider_marker,
-        spider_linewidth,
-        spider_alpha,
-    )
-
-    spider_color = 'dodgerblue'
-    series_label = 'GSHC'
-    data_values = [0.52, 0.18, 0.29, 0.39, 0.66, 0.42]
-    spider_plot = make_spider_chart(
-        spider_plot,
-        series_label,
-        data_labels,
-        data_values,
-        ticks,
-        tick_labels,
-        spider_color,
-        spider_marker,
-        spider_linewidth,
-        spider_alpha,
-    )
-    spider_figure.savefig('docs/spider_example.png')
+    parameters_file_name = 'test.toml'
+    parameters = parameters_from_TOML(parameters_file_name)
+    print('Make parameters input more specific')
