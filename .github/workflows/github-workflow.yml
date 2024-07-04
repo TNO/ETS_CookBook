@@ -5,11 +5,10 @@ jobs:
   Publish_documentation:
     runs-on: ubuntu-latest
     env:
-      CONFIG_FILE: folder/mkdocs.yml
+      CONFIG_FILE: mkdocs.yml
     steps:
       - run: pip install mkdocs
-      - working-directory: ./
-        run: mkdocs gh-deploy
+      - run: mkdocs gh-deploy
 
     # Testing:
     # runs-on: windows-latest
