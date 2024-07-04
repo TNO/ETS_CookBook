@@ -2,6 +2,7 @@
 # Make spider chart
 
 ## What it does
+This draws a spider/radar chart on a matplotlib plot/PolarAxes object.
 ## Inputs
 
 ### spider_plot

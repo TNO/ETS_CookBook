@@ -37,11 +37,14 @@ cook.reference_scale([0.26, 0.89])
 (You can replace the as cook with something else, or even skip it altogether:
 if you do skip it, then call the functions with ETS_CookBook.function).
 
+
+
 ## License
 
-This cookbook is released under the Apache 2.0 license.
-All accompanying documentation and manual are released under the 
-Creative Commons BY-SA 4.0 license.
+This cookbook is released under the [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+All accompanying documentation and manuals are released under the 
+[Creative Commons BY-SA 4.0 license](https://creativecommons.org/licenses/by-sa/4.0/deed.en)
+
 
 ## Documentation
 The documentation can be found [here](https://tno.github.io/ETS_CookBook/).

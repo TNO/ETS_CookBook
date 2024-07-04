@@ -77,7 +77,7 @@ draw in these.
 36. **rgba_code_color:**:Gets an RGBGA string from a color RGB tuple.
     This is useful for plotly.
     The A part os the color opacity.
-37. *make_sankey:**Makes a Sankey plot in plotly (comes out as an html file).
+37. **make_sankey:** Makes a Sankey plot in plotly (comes out as an html file).
 '''
 
 import datetime
