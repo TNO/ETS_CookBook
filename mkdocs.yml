@@ -1,0 +1,8 @@
+site_name: ChaProEV
+nav:
+ - Home: index.md
+ - Plotting:
+            - make_spider_chart: make_spider_chart.md
+
+
+theme: readthedocs
