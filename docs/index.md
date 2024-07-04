@@ -155,7 +155,7 @@ including the following:
 <tr>
 <td valign="middle" width=100px>
 <img src=eu-emblem-low-res.jpg alt="EU emblem" width=100%></td>
-<img src=MOPO_logo_main.svg width = 12%>
+<img src=MOPO_logo_main_onwhite.svg width = 12%>
 <td valign="middle">This project was partly develop under funding from 
 European Climate, 
 Infrastructure and Environment Executive Agency under the European Union’s 
