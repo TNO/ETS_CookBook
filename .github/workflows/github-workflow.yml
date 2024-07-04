@@ -4,8 +4,6 @@ jobs:
 
   Publish_documentation:
     runs-on: ubuntu-latest
-    # env:
-      # CONFIG_FILE: mkdocs.yml
     steps:
       - run: pip install mkdocs
       # - working-directory: ./
