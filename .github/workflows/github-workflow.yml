@@ -2,9 +2,8 @@
 # For more information see: https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Python.gitlab-ci.yml
 on: [push]
 image: python:latest
-stages:
-  - test
-test:
-  stage: test
-  script:
-    - pytest
+jobs:
+
+  test:
+    steps:
+      - run: pytest
