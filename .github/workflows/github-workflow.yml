@@ -1,9 +1,9 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Python.gitlab-ci.yml
+name: Github CI
 on: [push]
 image: python:latest
 jobs:
-
   test:
+  name: test
+  runs-on: windows-latest
     steps:
       - run: pytest
