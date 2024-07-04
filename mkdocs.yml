@@ -1,7 +1,6 @@
 site_name: ChaProEV
 nav:
  - Home: index.md
- - How to use: using.md
  - Plotting:
             - make_spider_chart: make_spider_chart.md
 
