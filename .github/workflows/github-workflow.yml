@@ -1,10 +1,7 @@
 name: Github CI
 on: [push]
-image: python:latest
 jobs:
-  test:
-  name: test
-  runs-on: windows-latest
-  steps:
-    - name: test
-    - run: pytest
+  Explore-GitHub-Actions:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
