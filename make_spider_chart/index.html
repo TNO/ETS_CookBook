@@ -94,14 +94,6 @@
 
     spider_figure = plt.figure()
     spider_plot = spider_figure.add_subplot(111, polar=True)
-    # matplotlib says this should create an Axes, but it actually creates
-    # a PolarAxes (which has the attribute set_thetagrids used in the function
-    # This sets an issue with MyPy, who thinks that this is an Axes at first
-    # because this is what add_subplot says.
-    # We might avoid the issue by using two variables, but that might create
-    # issues when plotting several spiders on top of each other,
-    # so the warning remains (until matplotlib also puts PolarAxes as a
-    # possible output type)
 
     spider_alpha = 0.26
     spider_plot = make_spider_chart(
@@ -132,13 +124,35 @@
         spider_linewidth,
         spider_alpha,
     )
-    plt.show()
+    spider_figure.savefig('docs/spider_example.png')
+
 
 </code></pre>
+<p><img alt="Spider example should be here" src="../spider_example.png" title="An example of a spider chart" /></p>
+<p>Note that we use spider_plot as both input and output of make_spider_chart.
+We do this so that we can plot two spiders on top of each other (by calling
+the function twice).</p>
 <h1 id="tests">Tests</h1>
 <h2 id="theta-labels">Theta labels</h2>
 <p>This test looks if the function sets the theta labels (around the spider) to
 the data labels.</p>
+<h1 id="typing-issues">Typing issues</h1>
+<h2 id="axes-versus-polaraxes">Axes versus PolarAxes</h2>
+<p>You might encounter an issue when running a MyPy (or other) type check.
+This comes from this line:</p>
+<pre><code class="language-python"> spider_plot.set_thetagrids(angles * 180 / np.pi, data_labels)
+</code></pre>
+<p>This puts the data labels as the theta labels (around the spider) requires
+spider_plot to be a PolarAxes (matplotlib.projecions.polar.PolarAxes) element
+because set_thetagrids is an attribute of PolarAxes (and not Axes).</p>
+<p>The problem is that the functions used to create a plot (an Axes element) claim
+to only create Axes, even if they create a PolarAxes, such as with the line below:</p>
+<pre><code class="language-python">spider_plot = spider_figure.add_subplot(111, polar=True)
+</code></pre>
+<p>Matplotlib claims that add_subplot creates an Axes object, but the result
+is a PolarAxes. This means that a type check (such as MyPy) might throw an
+error. This might be solved if matplotlib updates its typing documentation
+by adding the possibility that add_subplot can also create a PolarAxes.</p>
               
             </div>
           </div><footer>
