@@ -945,14 +945,17 @@ def make_spider_chart(
     series_label: str,
     data_labels: list[str],
     data_values: list[float],
-    markers: list[float],
-    marker_labels: list[str],
+    ticks: list[float],
+    tick_labels: list[str],
     spider_color: str,
     spider_marker: str,
     spider_linewidth: float,
     spider_alpha: float,
 ) -> matplotlib.projections.polar.PolarAxes:
-    ''' '''
+    '''
+    This function draws a spider chart on a plot (Axes) for a given series
+    of data (with values, labels, and formats).
+    '''
     angles = np.linspace(0, 2 * np.pi, len(data_labels), endpoint=False)
 
     # We first want to plot the contour of the spider.
@@ -979,8 +982,8 @@ def make_spider_chart(
     )
 
     spider_plot.set_thetagrids(angles * 180 / np.pi, data_labels)
-    spider_plot.set_yticks(markers)
-    spider_plot.set_yticklabels(marker_labels)
+    spider_plot.set_yticks(ticks)
+    spider_plot.set_yticklabels(tick_labels)
     spider_plot.legend()
 
     return spider_plot
@@ -1802,8 +1805,8 @@ if __name__ == '__main__':
     series_label = 'SFC'
     data_values = [0.6, 0, 0.26, 0.42, 0.89, 0.77]
     data_labels = ['Mango', 'Mapo', 'Lacrosse', 'Floorball', 'Switch', 'NDS']
-    markers = [0, 0.25, 0.50, 0.75, 1.0]
-    marker_labels = ['0%', '25%', '50%', '75%', '100%']
+    ticks = [0, 0.25, 0.50, 0.75, 1.0]
+    tick_labels = ['0%', '25%', '50%', '75%', '100%']
     spider_color = 'fuchsia'
     spider_marker = 'o'
     spider_linewidth = 2
@@ -1825,8 +1828,8 @@ if __name__ == '__main__':
         series_label,
         data_labels,
         data_values,
-        markers,
-        marker_labels,
+        ticks,
+        tick_labels,
         spider_color,
         spider_marker,
         spider_linewidth,
@@ -1841,8 +1844,8 @@ if __name__ == '__main__':
         series_label,
         data_labels,
         data_values,
-        markers,
-        marker_labels,
+        ticks,
+        tick_labels,
         spider_color,
         spider_marker,
         spider_linewidth,

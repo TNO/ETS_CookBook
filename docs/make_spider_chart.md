@@ -3,17 +3,53 @@
 
 ## What it does
 ## Inputs
+
+### spider_plot
+This is the plot on which the chart will be drawn.
+It needs to be a PolarAxes (matplotlib.projections.polar.PolarAxes).
+### series_label
+This is a label for your series of data, in the form of a string.
+### data_labels
+This a list of strings labelling each of your data points.
+### data_values
+This is a list of floats that contains the values of each of your elements
+(how far from the center of the spider they are).
+### ticks
+This is a list (of floats) of ticks along the spider (they should at least
+cover all your data values).
+### tick_labels
+This is a list of labels corresponding to the ticks above.
+The list needs to be of the same length as the one above, with
+each element corresponding to the one in the above list.
+### spider_color
+A string giveing the color name
+(see [here](https://matplotlib.org/stable/gallery/color/named_colors.html)
+for a list).
+### spider_marker
+A string to set the markers for each data point. 
+See [here](https://matplotlib.org/stable/api/markers_api.html) for options.
+### spider_linewidth
+A float setting the with o the spider line
+### spider_alpha
+A float (between 0 and 1) setting the opacity of the spider 
+(0=fully transparent, 1=fully opaque)
+
 ## Output
+This returns a plot (PolarAxes) with the spider chart drawn on it.
+Use the same plot/PolarAxesas output as you used for input, so
+that you can superpose spiders.
+
 ## Examples
 
+### Two spiders
 
 ``` python
 
     series_label = 'SFC'
     data_values = [0.6, 0, 0.26, 0.42, 0.89, 0.77]
     data_labels = ['Mango', 'Mapo', 'Lacrosse', 'Floorball', 'Switch', 'NDS']
-    markers = [0, 0.25, 0.50, 0.75, 1.0]
-    marker_labels = ['0%', '25%', '50%', '75%', '100%']
+    ticks = [0, 0.25, 0.50, 0.75, 1.0]
+    tick_labels = ['0%', '25%', '50%', '75%', '100%']
     spider_color = 'fuchsia'
     spider_marker = 'o'
     spider_linewidth = 2
@@ -27,8 +63,8 @@
         series_label,
         data_labels,
         data_values,
-        markers,
-        marker_labels,
+        ticks,
+        tick_labels,
         spider_color,
         spider_marker,
         spider_linewidth,
@@ -43,8 +79,8 @@
         series_label,
         data_labels,
         data_values,
-        markers,
-        marker_labels,
+        ticks,
+        tick_labels,
         spider_color,
         spider_marker,
         spider_linewidth,
