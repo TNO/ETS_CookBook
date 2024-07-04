@@ -2,18 +2,18 @@ name: Github CI
 on: [push]
 jobs:
 
-  Publish_documentation:
-    runs-on: ubuntu-latest
-    env:
-      CONFIG_FILE: mkdocs.yml
-    steps:
-      - run: pip install mkdocs
-      - run: ls
+  # Publish_documentation:
+  # #   runs-on: ubuntu-latest
+  # #   env:
+  #     CONFIG_FILE: mkdocs.yml
+  #   steps:
+  #     - run: pip install mkdocs
+  #     - run: ls
       # - working-directory: ./docs
         # run: mkdocs gh-deploy
 
-    # Testing:
-    # runs-on: windows-latest
-    # steps:
-      # - run: pip install pytest
-      # - run: pytest /tests
+    Testing:
+    runs-on: ubntu-latest
+    steps:
+      - run: pip install pytest
+      - run: pytest /tests
