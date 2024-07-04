@@ -13,7 +13,7 @@ jobs:
         # run: mkdocs gh-deploy
 
     Testing:
-    runs-on: ubntu-latest
-    steps:
-      - run: pip install pytest
-      - run: pytest /tests
+      runs-on: ubntu-latest
+      steps:
+        - run: pip install pytest
+        - run: pytest /tests
