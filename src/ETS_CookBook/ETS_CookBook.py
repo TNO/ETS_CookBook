@@ -1848,4 +1848,4 @@ if __name__ == '__main__':
         spider_linewidth,
         spider_alpha,
     )
-    plt.show()
+    spider_figure.savefig('docs/spider_example.png')
