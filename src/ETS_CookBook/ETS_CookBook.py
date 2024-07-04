@@ -62,7 +62,7 @@ to vertical
 (text/paragraphs, tables, pictures.)
 32. **get_rgb_255_code_string:**Creates a string with rgb values 
 (0-255), such as rgb(111, 233, 66). This is used for plotly.
-33. **map grid:**This function creates a grid of maps. You need to give it the data you want
+33. **map_grid:**This function creates a grid of maps. You need to give it the data you want
     to plot, the names of the quantities, and their colors, as well as
     some plot parameters (in your general parameters file, under
     a [map_grid_plot]  header). You also need to have a map areas data file
