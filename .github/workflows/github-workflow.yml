@@ -9,7 +9,7 @@ jobs:
     steps:
       - run: pip install mkdocs
       - working-directory: /docs
-      #  -run: mkdocs gh-deploy
+        run: mkdocs gh-deploy
 
     # Testing:
     # runs-on: windows-latest
