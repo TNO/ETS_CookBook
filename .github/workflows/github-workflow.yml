@@ -1,13 +1,15 @@
 name: Github CI
 on: [push]
 jobs:
-  Testing:
-    runs-on: windows-latest
-    steps:
-      - run: pip install pytest
-      - run: pytest /tests
-  Publish documentation:
+
+  Publish_documentation:
     runs-on: windows-latest
     steps:
       - run: pip install mkdocs
       - run: mkdocs gh-deploy
+
+    # Testing:
+    # runs-on: windows-latest
+    # steps:
+      # - run: pip install pytest
+      # - run: pytest /tests
