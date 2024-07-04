@@ -8,7 +8,7 @@ jobs:
       CONFIG_FILE: folder/mkdocs.yml
     steps:
       - run: pip install mkdocs
-      - working-directory: /docs
+      - working-directory: ./
         run: mkdocs gh-deploy
 
     # Testing:
