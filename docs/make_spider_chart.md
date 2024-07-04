@@ -58,3 +58,8 @@
     plt.show()
 
 ```
+
+# Tests
+## Theta labels
+This test looks if the function sets the theta labels (around the spider) to
+the data labels.
