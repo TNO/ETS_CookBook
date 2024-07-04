@@ -1,7 +1,10 @@
-name: GitHyub Workflow
-run-name: Running the workflow
-on: [push]
-jobs:
-  testing:
-  steps:
-    - run: pytest
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Python.gitlab-ci.yml
+
+image: python:latest
+stages:
+  - test
+test:
+  stage: test
+  script:
+    - pytest
