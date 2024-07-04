@@ -51,5 +51,3 @@ nav:
 theme: 
   name: readthedocs
   sticky_navigation: False
-  # sticky_navigation: False
-# titles_only: True
