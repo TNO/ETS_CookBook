@@ -3,12 +3,12 @@ on: [push]
 jobs:
 
   Publish_documentation:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     env:
       CONFIG_FILE: folder/mkdocs.yml
     steps:
       - run: pip install mkdocs
-      - working-directory: \docs\
+      - working-directory: ./docs
         run: mkdocs gh-deploy
 
     # Testing:
