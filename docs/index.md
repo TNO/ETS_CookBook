@@ -121,7 +121,7 @@ draw in these.
 37. *make_sankey:**Makes a Sankey plot in plotly (comes out as an html file).
 
 
-# Repository
+## Repository
 The code repository can be found [here](https://github.com/TNO/ETS_CookBook)
 The distribution package can be found [here](https://pypi.org/project/ETS-CookBook/)
 
