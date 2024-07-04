@@ -1,7 +1,10 @@
-# What the i does
-# Inputs
-# Output
-# Examples
+
+# Make spider chart
+
+## What it does
+## Inputs
+## Output
+## Examples
 
 
 ``` python
@@ -58,14 +61,14 @@ Note that we use spider_plot as both input and output of make_spider_chart.
 We do this so that we can plot two spiders on top of each other (by calling
 the function twice).
 
-# Tests
-## Theta labels
+## Tests
+### Theta labels
 This test looks if the function sets the theta labels (around the spider) to
 the data labels.
 
-# Typing issues
+## Typing issues
 
-## Axes versus PolarAxes
+### Axes versus PolarAxes
 You might encounter an issue when running a MyPy (or other) type check.
 This comes from this line:
 ``` python
