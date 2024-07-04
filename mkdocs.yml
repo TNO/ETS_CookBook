@@ -1,4 +1,4 @@
-site_name: ETS COokBook
+site_name: ETS CookBook
 nav:
   - Home: index.md
   - Plotting:
@@ -48,5 +48,8 @@ nav:
     - RGBA code color: rgba_code_color
 
 
-theme: readthedocs
+theme: 
+  name: readthedocs
+  sticky_navigation: False
+  # sticky_navigation: False
 # titles_only: True
