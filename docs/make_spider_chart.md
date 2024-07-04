@@ -124,3 +124,10 @@ Matplotlib claims that add_subplot creates an Axes object, but the result
 is a PolarAxes. This means that a type check (such as MyPy) might throw an
 error. This might be solved if matplotlib updates its typing documentation
 by adding the possibility that add_subplot can also create a PolarAxes.
+
+
+
+## Open issues
+
+### Colors outside of matplotlib
+Need to add support for colors other than matplotlib (via RGB)

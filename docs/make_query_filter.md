@@ -1,7 +1,7 @@
-# Delete Word element
+# Make query filter
 
 ## What it does
-Deletes a given element in a Word document.
+Returns a query filter string that can be used in an SQL query.
 
 ## Inputs
 ###

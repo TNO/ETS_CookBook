@@ -67,7 +67,7 @@ to vertical
     some plot parameters (in your general parameters file, under
     a [map_grid_plot]  header). You also need to have a map areas data file
     such as this one:
-    https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/110m/cultural/ne_110m_admin_0_countries.zip
+https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/110m/cultural/ne_110m_admin_0_countries.zip
     You also need to provide a csv file that translates the names of the
     countries you are using into ISOA3 codes, which can be found here
     https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3
@@ -111,7 +111,7 @@ import xarray as xr
 def check_if_folder_exists(folder_to_check: str) -> None:
     '''
     Checks if a folder exists. If it does not, it creates it.
-    This way, users can setup a new (sub-)folder in the configuration file
+    This way, users can set up a new (sub-)folder in the configuration file
     without having to ensure that it already exits or create it.
     '''
 
@@ -137,7 +137,7 @@ def reference_scale(
     number_list: list[float], digit_shift: int = 0
 ) -> list[float]:
     '''
-    This function takes a list of numbers an returns a scale
+    This function takes a list of numbers and returns a scale
     (lower and upper boundary) they are in.
     The digit shift parameter tells us on which digit we need to
     focus. The default is 0, so the upper boundary of 53.57 will be 60
@@ -678,7 +678,7 @@ def put_dataframe_in_sql_in_chunks(
     This function takes a Dataframe and writes it into the table
     of an SQL database. It does so in chunks to avoid memory issues.
     The parameter drop_existing table tells us if we want to
-    dro/overwrite the table if it exists (it is True by default).
+    drop/overwrite the table if it exists (it is True by default).
     If set to False, the data will be appended (if the table exists).
     '''
 
@@ -778,12 +778,12 @@ def read_query_generator(
     need if the name has spaces, so use:
     source_table = f'"My Table"'
     as an input
-    - query_filter_quntities: A list of strings each representing a column
+    - query_filter_quantities: A list of strings each representing a column
     name the user wants to filter. Again, names with spaces require
     f strings and double quotes, so add:
     f'"Surveyed Area"' to your list of filter names
     - query_filter_types: This list (that has to be the same length as the
-    above liste of quantities)
+    above list of quantities)
     says which filter to use. Currently supported options are:
         - '='       (equal to)
         - '<'       (smaller than)
@@ -1155,7 +1155,7 @@ def read_table_from_database(
     table_name: str, database_file: str
 ) -> pd.DataFrame:
     '''
-    Reads a table from an sqlite3 database and retruns it as a
+    Reads a table from an sqlite3 database and returns it as a
     dataframe
     '''
     with sqlite3.connect(database_file) as sql_connection:
@@ -1181,14 +1181,14 @@ def put_dataframe_in_word_document(
     '''
     This function puts a Dataframe into a given Word document.
     If the document does not exist, it is created.
-    You can also optionally specify number formats fpr each column (in a list).
+    You can also optionally specify number formats for each column (in a list).
     If you do not provide the same amount of formats as there are columns
     in your DataFrame, then only the first one will be used across all columns.
     If you don't provide any format list, then the default is that your numbers
     will be displayed with two decimals.
     You can also provide a table format.
     Note that the table style must exist in the document for you to be able to
-    use it (so make make document, put a table in it with the style you
+    use it (so make document, put a table in it with the style you
     want, and delete the table before saving). If it does not, you can use the
     defaults listed here:
     https://python-docx.readthedocs.io/en/latest/user/styles-understanding.html
@@ -1346,7 +1346,7 @@ def make_cell_text_vertical(
     '''
     Changes the orientation of a Word table cell to vertical,
     with the option to get text from bottom to top (default)
-    or top to bottom (set the optional bottom_to_top argument to True
+    or top to bottom (set the optional bottom_to_top argument to True)
     See
     https://stackoverflow.com/questions/47738013/how-to-rotate-text-in-table-cells
     for a breakdown
@@ -1368,7 +1368,7 @@ def make_cell_text_vertical(
 
 def delete_word_element(element_reference) -> None:
     '''
-    Deletes a give element in a Word document.
+    Deletes a given element in a Word document.
     '''
     element = element_reference._element
     element.getparent().remove(element)
@@ -1582,7 +1582,7 @@ def put_plots_on_map(
     '''
     Puts plots/axes on a map figure. You can then draw in these.
     The plot_y_total_values are the sizes of the plots per country (for example
-    the size of the stacked bar for a stacked bar plot)
+    the size of the stacked bar for a stacked bar plot).
     '''
 
     location_code_header = map_parameters['location_code_header']
@@ -1653,9 +1653,9 @@ def rgba_code_color(
     color_rgb: tuple[int, int, int], color_opacity: float
 ) -> str:
     '''
-    Gets an RGBGA string from a color RGB tuple.
+    Gets an RGBA string from a color RGB tuple.
     This is useful for plotly.
-    The A part os the color opacity.
+    The A part is the color opacity.
     '''
     rgba_string = (
         f'rgba('
@@ -1787,3 +1787,4 @@ if __name__ == '__main__':
     parameters_file_name = 'test.toml'
     parameters = parameters_from_TOML(parameters_file_name)
     print('Make parameters input more specific')
+    print('Open issues')
