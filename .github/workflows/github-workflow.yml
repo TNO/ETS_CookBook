@@ -4,6 +4,8 @@ jobs:
 
   Publish_documentation:
     runs-on: windows-latest
+    env:
+      CONFIG_FILE: folder/mkdocs.yml
     steps:
       - run: pip install mkdocs
       - run: mkdocs gh-deploy
