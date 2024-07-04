@@ -7,8 +7,9 @@ jobs:
     env:
       CONFIG_FILE: folder/mkdocs.yml
     steps:
-      - run: pip install mkdocs-material
-      - run: mkdocs gh-deploy
+      - run: pip install mkdocs
+      - working-directory: .
+        run: mkdocs gh-deploy
 
     # Testing:
     # runs-on: windows-latest
