@@ -51,6 +51,26 @@
               <ul class="current">
                   <li class="toctree-l1 current"><a class="reference internal current" href="#">make_spider_chart</a>
     <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#what-it-does">What it does</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#inputs">Inputs</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#output">Output</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#tests">Tests</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#theta-labels">Theta labels</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#typing-issues">Typing issues</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#axes-versus-polaraxes">Axes versus PolarAxes</a>
+    </li>
+        </ul>
+    </li>
     </ul>
                   </li>
               </ul>
@@ -78,10 +98,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="what-the-i-does">What the i does</h1>
-<h1 id="inputs">Inputs</h1>
-<h1 id="output">Output</h1>
-<h1 id="examples">Examples</h1>
+                <h1 id="make-spider-chart">Make spider chart</h1>
+<h2 id="what-it-does">What it does</h2>
+<h2 id="inputs">Inputs</h2>
+<h2 id="output">Output</h2>
+<h2 id="examples">Examples</h2>
 <pre><code class="language-python">
     series_label = 'SFC'
     data_values = [0.6, 0, 0.26, 0.42, 0.89, 0.77]
@@ -132,12 +153,12 @@
 <p>Note that we use spider_plot as both input and output of make_spider_chart.
 We do this so that we can plot two spiders on top of each other (by calling
 the function twice).</p>
-<h1 id="tests">Tests</h1>
-<h2 id="theta-labels">Theta labels</h2>
+<h2 id="tests">Tests</h2>
+<h3 id="theta-labels">Theta labels</h3>
 <p>This test looks if the function sets the theta labels (around the spider) to
 the data labels.</p>
-<h1 id="typing-issues">Typing issues</h1>
-<h2 id="axes-versus-polaraxes">Axes versus PolarAxes</h2>
+<h2 id="typing-issues">Typing issues</h2>
+<h3 id="axes-versus-polaraxes">Axes versus PolarAxes</h3>
 <p>You might encounter an issue when running a MyPy (or other) type check.
 This comes from this line:</p>
 <pre><code class="language-python"> spider_plot.set_thetagrids(angles * 180 / np.pi, data_labels)
