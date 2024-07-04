@@ -1,9 +1,7 @@
 name: GitHyub Workflow
 run-name: Running the workflow
 on: [push]
-stages:
-  - test
-test:
-  stage: test
-  script: 
-    - pytest
+jobs:
+  testing:
+  steps:
+    - run: pytest
