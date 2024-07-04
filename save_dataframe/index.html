@@ -121,6 +121,42 @@
                   <li class="toctree-l1"><a class="reference internal" href="../save_figure/">Save figure</a>
                   </li>
                   <li class="toctree-l1 current"><a class="reference internal current" href="#">Save DataFrame</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#what-it-does">What it does</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#inputs">Inputs</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#_1"></a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#output">Output</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#_2"></a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#_3"></a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#tests">Tests</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#_4"></a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#open-issues">Open issues</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#xml-issues">XML issues</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#unsupported-formats">Unsupported formats</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../from_grib_to_dataframe/">From grub to DataFrame</a>
                   </li>
@@ -164,7 +200,47 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                
+                <h1 id="save-dataframe">Save DataFrame</h1>
+<h2 id="what-it-does">What it does</h2>
+<p>This function saves a pandas DataFrame to a number of
+file formats and an output folder that are all specified in a
+TOML parameters file (under a [files.dataframe_outputs] heading).</p>
+<p>Note that for some file types, you might need to install additional
+libraries.</p>
+<p>Also note that some formats will be saved into a group file that
+can contain several other DataFrames (for example sheets into an Excel
+workbook or tables into an SQL database). DataFrame_name will be the
+file name if the file format does not use group files. If the format does
+use a group file, then DataFrame_name will be used for the sub-elements
+(sheets, tables, for example), and groupfile_name will be used for
+the file name (you can of course use the same value for both), and will be
+unused if the file format does not use group files.</p>
+<h2 id="inputs">Inputs</h2>
+<h3 id="_1"></h3>
+<h2 id="output">Output</h2>
+<h3 id="_2"></h3>
+<h2 id="examples">Examples</h2>
+<h3 id="_3"></h3>
+<h2 id="tests">Tests</h2>
+<h3 id="_4"></h3>
+<h2 id="open-issues">Open issues</h2>
+<h3 id="xml-issues">XML issues</h3>
+<p>Bug to fix: XML does not accet a number to start names (or
+various case variations of xml), which must currently
+be handled by the user (who must avoid these).
+Other bug: Removing non-alphanumeric characters in the index does not seem
+to work (for xml and stata)</p>
+<h3 id="unsupported-formats">Unsupported formats</h3>
+<p>gbq and orc outputs are not currently supported, as gbq is not
+a local file format, but a cloud-based one and orc does not seem to work
+with pyarrow (at least in Windows).</p>
+<p>Note that Pandas has a few more export formats that we skipped
+orc is not supported in arrows (ar least on Windows)
+https://stackoverflow.com/questions/58822095/no-module-named-pyarrow-orc
+gbq is about Google cloud storage, not about local files
+https://cloud.google.com/bigquery/docs/introduction
+Note that clipboard does not produce a file,
+but can still be used locally, so the function supports it.</p>
               
             </div>
           </div><footer>
