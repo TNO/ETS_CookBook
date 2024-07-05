@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-from ETS_CookBook import make_spider_chart
+from ETS_CookBook import ETS_CookBook as cook
 
 
 def test_theta_labels_setting():
@@ -32,7 +32,7 @@ def test_theta_labels_setting():
     spider_plot = spider_figure.add_subplot(111, polar=True)
 
     spider_alpha = 0.26
-    spider_plot = make_spider_chart(
+    spider_plot = cook.make_spider_chart(
         spider_plot,
         series_label,
         data_labels,

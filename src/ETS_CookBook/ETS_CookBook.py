@@ -128,7 +128,7 @@ def parameters_from_TOML(parameters_file_name: str) -> ty.Dict:
     '''
 
     with open(parameters_file_name, mode='rb') as parameters_file:
-        parameters = tomllib.load(parameters_file)
+        parameters: ty.Dict = tomllib.load(parameters_file)
 
     return parameters
 
@@ -146,8 +146,11 @@ def reference_scale(
     (x-axis boundaries).
     '''
 
-    number_list_boundaries = [min(number_list), max(number_list)]
-    boundary_powers_of_ten = [
+    number_list_boundaries: ty.List[float] = [
+        min(number_list),
+        max(number_list),
+    ]
+    boundary_powers_of_ten: ty.List[int] = [
         (
             int(math.log10(abs(number))) - digit_shift
             # The first term gives us the power of ten of the highest digit,
@@ -158,13 +161,15 @@ def reference_scale(
         for number in number_list_boundaries
     ]
 
-    dividers = [math.pow(10, power) for power in boundary_powers_of_ten]
+    dividers: ty.List[float] = [
+        math.pow(10, power) for power in boundary_powers_of_ten
+    ]
 
-    lower_scale = (
+    lower_scale: float = (
         math.floor((number_list_boundaries[0]) / dividers[0]) * dividers[0]
     )
 
-    upper_scale = (
+    upper_scale: float = (
         math.ceil((number_list_boundaries[1]) / dividers[1]) * dividers[1]
     )
 
@@ -183,7 +188,7 @@ def dataframe_from_Excel_table_name(
     True (its default value. A False value loads formulas)
     '''
 
-    source_workbook = openpyxl.load_workbook(
+    source_workbook: openpyxl.Workbook = openpyxl.load_workbook(
         Excel_file, data_only=load_data_only
     )
 
@@ -228,7 +233,7 @@ def dataframe_to_Excel(
     '''
 
     if not os.path.isfile(Excel_workbook):
-        new_workbook = openpyxl.Workbook()
+        new_workbook: openpyxl.Workbook = openpyxl.Workbook()
         new_workbook.save(Excel_workbook)
 
     with pd.ExcelWriter(
@@ -246,8 +251,8 @@ def get_extra_colors(parameters: ty.Dict) -> pd.DataFrame:
     as values.
     '''
 
-    colors = parameters['colors']
-    extra_colors = pd.DataFrame(columns=['R', 'G', 'B'])
+    colors: ty.Dict[str, int] = parameters['colors']
+    extra_colors: pd.DataFrame = pd.DataFrame(columns=['R', 'G', 'B'])
     for color in colors:
         extra_colors.loc[color] = colors[color]
     extra_colors = extra_colors / 255
@@ -262,7 +267,7 @@ def get_rgb_from_name(color_name: str, parameters: ty.Dict) -> ty.List[float]:
     the values given.
     If it is a matplotlib color, then we use the matplotlib function.
     '''
-    extra_colors = get_extra_colors(parameters)
+    extra_colors: pd.DataFrame = get_extra_colors(parameters)
 
     if color_name in extra_colors.index.values:
         return list(extra_colors.loc[color_name].values)
@@ -276,7 +281,7 @@ def rgb_color_list(
     '''
     Gets a list of RGB codes for a list of color names.
     '''
-    rgb_codes = [
+    rgb_codes: ty.List[ty.List[float]] = [
         get_rgb_from_name(color_name, parameters) for color_name in color_names
     ]
 
@@ -292,7 +297,7 @@ def register_color_bars(parameters: ty.Dict) -> None:
     in the list of available color maps.
     '''
 
-    color_bars = parameters['color_bars']
+    color_bars: ty.Dict[str, ty.List[str]] = parameters['color_bars']
 
     # This dictionary stores the dictionaries for each color bar
     color_bar_dictionary: ty.Dict = {}
@@ -304,14 +309,14 @@ def register_color_bars(parameters: ty.Dict) -> None:
     # if cretaing discontinuities.
     # See https://matplotlib.org/stable/gallery/color/custom_cmap.html
     # for details
-    base_colors_for_color_bar = ['red', 'green', 'blue']
+    base_colors_for_color_bar: ty.List[str] = ['red', 'green', 'blue']
 
     # We fill the color bar dictionary
     for color_bar in color_bars:
         # We read the color list
         color_bar_colors = color_bars[color_bar]
         # We set the color steps, based on the color list
-        color_steps = np.linspace(0, 1, len(color_bar_colors))
+        color_steps: np.ndarray = np.linspace(0, 1, len(color_bar_colors))
 
         color_bar_dictionary[color_bar] = {}
         for base_color_index, base_color in enumerate(
@@ -716,7 +721,7 @@ def query_list_from_file(sql_file: str) -> ty.List[str]:
     '''
 
     with open(sql_file) as script_file:
-        sql_queries = script_file.read().split(';')
+        sql_queries: ty.List[str] = script_file.read().split(';')
 
     sql_queries.remove('')
     return sql_queries
@@ -728,7 +733,7 @@ def dataframes_from_query_list(
     '''
     This returns a list of dataframes, each obtained from a query in the list
     '''
-    dataframe_list = [
+    dataframe_list: ty.List[pd.DataFrame] = [
         pd.read_sql(sql_query, sql_connection) for sql_query in query_list
     ]
 
@@ -744,9 +749,9 @@ def from_grib_to_dataframe(grib_file: str) -> pd.DataFrame:
     See:
     https://github.com/ecmwf/eccodes-python/issues/54#issuecomment-925036724
     '''
-    grib_engine = 'cfgrib'
+    grib_engine: str = 'cfgrib'
 
-    source_data = xr.load_dataset(grib_file, engine=grib_engine)
+    source_data: xr.Dataset = xr.load_dataset(grib_file, engine=grib_engine)
     source_dataframe = source_data.to_dataframe()
 
     return source_dataframe
@@ -809,11 +814,11 @@ def read_query_generator(
 
     '''
 
-    query_filter = make_query_filter(
+    query_filter: str = make_query_filter(
         query_filter_quantities, query_filter_types, query_filter_values
     )
 
-    output_query = (
+    output_query: str = (
         f'select {quantities_to_display} from {source_table} '
         f'{query_filter};'
     )
@@ -826,14 +831,14 @@ def database_tables_columns(database: str) -> ty.Dict:
     Returns a dictionary with the tables of a database as keys and their
     columns as values.
     '''
-    database_connection = sqlite3.connect(database)
-    tables_query = 'select name from sqlite_master where type="table";'
-    database_cursor = database_connection.cursor()
+    database_connection: sqlite3.Connection = sqlite3.connect(database)
+    tables_query: str = 'select name from sqlite_master where type="table";'
+    database_cursor: sqlite3.Cursor = database_connection.cursor()
     database_cursor.execute(tables_query)
-    database_tables = database_cursor.fetchall()
-    tables_columns = {}
+    database_tables: ty.List[str] = database_cursor.fetchall()
+    tables_columns: ty.Dict[str, ty.Any] = {}
     for table in database_tables:
-        table_name = table[0]
+        table_name: str = table[0]
         # table_name = f'"{table[0]}"'
         table_cursor = database_connection.execute(
             f'select * from "{table_name}"'
@@ -850,14 +855,16 @@ def download_and_save_file(download_url: str, output_folder: str) -> None:
     Downloads a file from an URL and saves it. If the file is a zip file,
     the function extracts its contents.
     '''
-    request_data = requests.get(download_url)
-    file_name = download_url.split('/')[-1]
+    request_data: requests.Response = requests.get(download_url)
+    file_name: str = download_url.split('/')[-1]
 
     with open(f'{output_folder}/{file_name}', 'wb') as output_file:
         output_file.write(request_data.content)
 
     if file_name.split('.')[-1] == 'zip':
-        zip_data = zipfile.ZipFile(f'{output_folder}/{file_name}')
+        zip_data: zipfile.ZipFile = zipfile.ZipFile(
+            f'{output_folder}/{file_name}'
+        )
         for zip_info in zip_data.infolist():
             zip_data.extract(zip_info, path=output_folder)
 
@@ -874,26 +881,30 @@ def string_to_float(my_string: str) -> float:
     return my_output
 
 
-def get_map_area_data(parameters: ty.Dict) -> pd.DataFrame:
+def get_map_area_data(parameters: ty.Dict) -> gpd.GeoDataFrame:
     '''
     This function gets and processes the area data and sets it
     into a DataFrame. It contains polygons/multipolygons
     (they are at a given granularity level, but also have references to higher
     levels).
     '''
-    maps_parameters = parameters['maps']
-    map_data_folder = maps_parameters['map_data_folder']
+    maps_parameters: ty.Dict[str, ty.Any] = parameters['maps']
+    map_data_folder: str = maps_parameters['map_data_folder']
     # This file contains data at NUTS level 3. The reason for this is so that
     # we can remove the outer regions (such as Svalbard or French overseas
     # territories).
-    area_data_file_name = maps_parameters['area_data_file_name']
+    area_data_file_name: str = maps_parameters['area_data_file_name']
 
-    area_data = gpd.read_file(f'{map_data_folder}/{area_data_file_name}')
+    area_data: gpd.GeoDataFrame = gpd.read_file(
+        f'{map_data_folder}/{area_data_file_name}'
+    )
 
     # This is the list of regions to remove from the map.
     # These are the outer regions (such as Svalbard or French overseas
     # territories).
-    general_exclusion_codes = maps_parameters['general_exclusion_codes']
+    general_exclusion_codes: ty.List[str] = maps_parameters[
+        'general_exclusion_codes'
+    ]
 
     # This removes the excluded areas. The ~ flips the boolean values
     # so that we keep the areas that are not in the exclusion list.
@@ -902,40 +913,44 @@ def get_map_area_data(parameters: ty.Dict) -> pd.DataFrame:
     return area_data
 
 
-def get_map_borders(NUTS_level: int, parameters: ty.Dict) -> pd.DataFrame:
+def get_map_borders(NUTS_level: int, parameters: ty.Dict) -> gpd.GeoDataFrame:
     '''
     This function gets the borders/contours of regions at a specified NUTS
     level.
     '''
-    maps_parameters = parameters['maps']
-    map_data_folder = maps_parameters['map_data_folder']
-    border_data_file_prefix = maps_parameters['border_data_file_prefix']
-    border_data_file_suffix = maps_parameters['border_data_file_suffix']
+    maps_parameters: ty.Dict[str, ty.Any] = parameters['maps']
+    map_data_folder: str = maps_parameters['map_data_folder']
+    border_data_file_prefix: str = maps_parameters['border_data_file_prefix']
+    border_data_file_suffix: str = maps_parameters['border_data_file_suffix']
 
-    border_data_file = (
+    border_data_file: str = (
         f'{border_data_file_prefix}{NUTS_level}{border_data_file_suffix}'
     )
 
-    border_data = gpd.read_file(f'{map_data_folder}/{border_data_file}')
+    border_data: gpd.GeoDataFrame = gpd.read_file(
+        f'{map_data_folder}/{border_data_file}'
+    )
 
     return border_data
 
 
-def get_map_points(NUTS_level: int, parameters: ty.Dict) -> pd.DataFrame:
+def get_map_points(NUTS_level: int, parameters: ty.Dict) -> gpd.GeoDataFrame:
     '''
     This function gets the points/labels of regions at a specified NUTS
     level.
     '''
-    maps_parameters = parameters['maps']
-    map_data_folder = maps_parameters['map_data_folder']
-    points_data_file_prefix = maps_parameters['points_data_file_prefix']
-    points_data_file_suffix = maps_parameters['points_data_file_suffix']
+    maps_parameters: ty.Dict[str, ty.Any] = parameters['maps']
+    map_data_folder: str = maps_parameters['map_data_folder']
+    points_data_file_prefix: str = maps_parameters['points_data_file_prefix']
+    points_data_file_suffix: str = maps_parameters['points_data_file_suffix']
 
-    points_data_file = (
+    points_data_file: str = (
         f'{points_data_file_prefix}{NUTS_level}{points_data_file_suffix}'
     )
 
-    points_data = gpd.read_file(f'{map_data_folder}/{points_data_file}')
+    points_data: gpd.GeoDataFrame = gpd.read_file(
+        f'{map_data_folder}/{points_data_file}'
+    )
 
     return points_data
 
@@ -956,14 +971,16 @@ def make_spider_chart(
     This function draws a spider/radar chart on a plot (Axes) for a given
     series of data (with values, labels, and formats).
     '''
-    angles = np.linspace(0, 2 * np.pi, len(data_labels), endpoint=False)
+    angles: ty.List[float] = list(
+        np.linspace(0, 2 * np.pi, len(data_labels), endpoint=False)
+    )
 
     # We first want to plot the contour of the spider.
     # We repeat the first value at the end, since we want to close the
     # contour.
     angles_for_contour: np.ndarray = np.concatenate((angles, [angles[0]]))
     # data_labels_for_contour = np.concatenate((data_labels, [data_labels[0]]))
-    data_values_for_contour = list(
+    data_values_for_contour: ty.List[float] = list(
         np.concatenate((data_values, [data_values[0]]))
     )
 
@@ -981,7 +998,7 @@ def make_spider_chart(
         angles, data_values, alpha=spider_alpha, color=spider_color
     )
 
-    spider_plot.set_thetagrids(angles * 180 / np.pi, data_labels)
+    spider_plot.set_thetagrids(np.array(angles) * 180 / np.pi, data_labels)
     spider_plot.set_yticks(ticks)
     spider_plot.set_yticklabels(tick_labels)
     spider_plot.legend()
@@ -1041,8 +1058,8 @@ def update_database_table(
         e.g: [(52.1,4.9),(52.0,5.1)]
 
     '''
-    first_set = True
-    set_query = ''
+    first_set: bool = True
+    set_query: str = ''
     for set_element, element_values in zip(columns_to_update, new_values):
         if first_set:
             set_query += 'set '
@@ -1052,16 +1069,16 @@ def update_database_table(
 
         set_query += f'{set_element} = {element_values}'
 
-    query_filter = make_query_filter(
+    query_filter: str = make_query_filter(
         query_filter_quantities, query_filter_types, query_filter_values
     )
 
-    update_query = (
+    update_query: str = (
         f'update {table_to_update} ' f'{set_query} ' f'{query_filter};'
     )
 
     with sqlite3.connect(database_to_update) as database_connection:
-        update_cursor = database_connection.cursor()
+        update_cursor: sqlite3.Cursor = database_connection.cursor()
         update_cursor.execute(update_query)
         database_connection.commit()
 
