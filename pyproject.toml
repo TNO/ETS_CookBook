@@ -36,3 +36,7 @@ pythonpath = ['src/ETS_CookBook']
 
 [project.urls]
 'Homepage' = 'https://github.com/TNO/ETS_CookBook'
+
+[[tool.mypy.overrides]]
+module = ['geopandas/*', 'plotly/*', 'tomllib/*', 'tomli/*']
+ignore_missing_imports = true

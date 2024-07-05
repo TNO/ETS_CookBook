@@ -87,18 +87,12 @@ import sqlite3
 import typing as ty
 import zipfile
 
-import matplotlib.axes
-import matplotlib.figure
-import matplotlib.projections
-
-try:
-    import tomllib
-except ModuleNotFoundError:
-    import tomli as tomllib
-
 import docx
 import geopandas as gpd
 import matplotlib
+import matplotlib.axes
+import matplotlib.figure
+import matplotlib.projections
 import matplotlib.pyplot as plt
 import numpy as np
 import openpyxl
@@ -106,6 +100,11 @@ import pandas as pd
 import plotly.graph_objects as go
 import requests
 import xarray as xr
+
+try:
+    import tomllib
+except ModuleNotFoundError:
+    import tomli as tomllib
 
 
 def check_if_folder_exists(folder_to_check: str) -> None:
@@ -1594,7 +1593,7 @@ def put_plots_on_map(
     map_data: pd.DataFrame,
     map_parameters: ty.Dict,
     plot_y_total_values: pd.DataFrame,
-    projection_type: str | None = None,
+    projection_type: ty.Optional[str] = None,
 ) -> ty.Dict[str, matplotlib.axes.Axes]:
     '''
     Puts plots/axes on a map figure. You can then draw in these.
@@ -1651,16 +1650,16 @@ def put_plots_on_map(
             y_size = (
                 plot_y_total_values.loc[location] * y_size_scale / y_size_max
             )
-            # We create the plot/axis with the right size and scaling factors
+            # We create the plot/Axes with the right size and scaling factors
+            plot_rectangle: ty.Tuple[float, float, float, float] = (
+                x_start
+                * (1 + longitude_scaling * longitude / maximum_longitude),
+                y_start * (1 + latitude_scaling * latitude / maximum_latitude),
+                x_size,
+                y_size,
+            )
             plots_on_top[location] = map_figure.add_axes(
-                [
-                    x_start
-                    * (1 + longitude_scaling * longitude / maximum_longitude),
-                    y_start
-                    * (1 + latitude_scaling * latitude / maximum_latitude),
-                    x_size,
-                    y_size,
-                ],
+                plot_rectangle,
                 projection=projection_type,
             )
     return plots_on_top
