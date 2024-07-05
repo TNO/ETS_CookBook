@@ -6,7 +6,7 @@ build-backend = 'setuptools.build_meta'
 
 [project]
 name = 'ETS_CookBook'
-version = '1.0.23'
+version = '1.0.24'
 authors = [
   { name='Omar Usmani', email='Omar.Usmani@TNO.nl' },
 ]
@@ -22,7 +22,13 @@ classifiers = [
 
 dynamic = ['dependencies']
 [tool.setuptools.dynamic]
-dependencies = {file = ["requirements.txt"]}
+dependencies = {file = ['requirements.txt']}
+
+[tool.setuptools.package-data]
+'ETS_CookBook' = ['py.typed']
+
+[tool.setuptools.packages.find]
+where = ['src/ETS_CookBook']
 
 [tool.pytest.ini_options]
 pythonpath = ['src/ETS_CookBook']

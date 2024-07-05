@@ -60,11 +60,11 @@ to vertical
 30. **delete_word_element:**  Deletes a give element in a Word document.
 31. **clear_word_document:** Clears a Word document of its elements
 (text/paragraphs, tables, pictures.)
-32. **get_rgb_255_code_string:**Creates a string with rgb values 
+32. **get_rgb_255_code_string:**Creates a string with rgb values
 (0-255), such as rgb(111, 233, 66). This is used for plotly.
-33. **map_grid:**This function creates a grid of maps. You need to give it the data you want
-    to plot, the names of the quantities, and their colors, as well as
-    some plot parameters (in your general parameters file, under
+33. **map_grid:**This function creates a grid of maps. You need to give it the
+    data you want to plot, the names of the quantities, and their colors,
+    as well as some plot parameters (in your general parameters file, under
     a [map_grid_plot]  header). You also need to have a map areas data file
     such as this one:
 https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/110m/cultural/ne_110m_admin_0_countries.zip
@@ -84,8 +84,8 @@ import datetime
 import math
 import os
 import sqlite3
+import typing as ty
 import zipfile
-from typing import Any, Literal
 
 import matplotlib.axes
 import matplotlib.figure
@@ -121,7 +121,7 @@ def check_if_folder_exists(folder_to_check: str) -> None:
         os.makedirs(folder_to_check)
 
 
-def parameters_from_TOML(parameters_file_name: str) -> dict:
+def parameters_from_TOML(parameters_file_name: str) -> ty.Dict:
     '''
     Reads a TOML parameters file name and returns a parameters
     dictionary.
@@ -134,8 +134,8 @@ def parameters_from_TOML(parameters_file_name: str) -> dict:
 
 
 def reference_scale(
-    number_list: list[float], digit_shift: int = 0
-) -> list[float]:
+    number_list: ty.List[float], digit_shift: int = 0
+) -> ty.List[float]:
     '''
     This function takes a list of numbers and returns a scale
     (lower and upper boundary) they are in.
@@ -237,7 +237,7 @@ def dataframe_to_Excel(
         dataframe_to_append.to_excel(writer, sheet_name=my_sheet)
 
 
-def get_extra_colors(parameters: dict) -> pd.DataFrame:
+def get_extra_colors(parameters: ty.Dict) -> pd.DataFrame:
     '''
     This function gets the user-defined extra colors from a file.
     This file contains the names of the colors, and their RGB values
@@ -255,7 +255,7 @@ def get_extra_colors(parameters: dict) -> pd.DataFrame:
     return extra_colors
 
 
-def get_rgb_from_name(color_name: str, parameters: dict) -> list[float]:
+def get_rgb_from_name(color_name: str, parameters: ty.Dict) -> ty.List[float]:
     '''
     This function takes a color name and returns its RGB values (0 to 1).
     If the color name is in the extra colors, then, we use
@@ -271,8 +271,8 @@ def get_rgb_from_name(color_name: str, parameters: dict) -> list[float]:
 
 
 def rgb_color_list(
-    color_names: list[str], parameters: dict
-) -> list[list[float]]:
+    color_names: ty.List[str], parameters: ty.Dict
+) -> ty.List[ty.List[float]]:
     '''
     Gets a list of RGB codes for a list of color names.
     '''
@@ -283,7 +283,7 @@ def rgb_color_list(
     return rgb_codes
 
 
-def register_color_bars(parameters: dict) -> None:
+def register_color_bars(parameters: ty.Dict) -> None:
     '''
     This function reads the user-defined color bars in a parameter file
     (names for the bars, and a list of the colors they contain, with the
@@ -295,7 +295,7 @@ def register_color_bars(parameters: dict) -> None:
     color_bars = parameters['color_bars']
 
     # This dictionary stores the dictionaries for each color bar
-    color_bar_dictionary: dict = {}
+    color_bar_dictionary: ty.Dict = {}
     # These colors are the three base keys of each bar color dictionary
     # Each dictionary contains a tuple of tuples for each base colors
     # Each of these sub-tuples cotains a step (between 0 and 1),
@@ -420,7 +420,7 @@ def save_figure(
     figure: matplotlib.figure.Figure,
     figure_name: str,
     output_folder: str,
-    parameters: dict,
+    parameters: ty.Dict,
 ) -> None:
     '''
     This function saves a Matplolib figure to a number of
@@ -446,7 +446,7 @@ def save_dataframe(
     dataframe_name: str,
     groupfile_name: str,
     output_folder: str,
-    parameters: dict,
+    parameters: ty.Dict,
 ) -> None:
     '''
     This function saves a pandas dataframe to a number of
@@ -538,7 +538,7 @@ def save_dataframe(
         True,
     ]
 
-    file_functions: list[function] = []
+    file_functions: ty.List[ty.Callable] = []
     for file_type, is_groupfile in zip(file_types, is_groupfile_per_type):
 
         # Some file formats require some extra processing, so
@@ -691,7 +691,7 @@ def put_dataframe_in_sql_in_chunks(
 
     with sqlite3.connect(sql_file) as sql_connection:
         if drop_existing_table:
-            table_action: Literal['fail', 'replace', 'append'] = 'replace'
+            table_action: ty.Literal['fail', 'replace', 'append'] = 'replace'
         else:
             table_action = 'append'
 
@@ -710,7 +710,7 @@ def put_dataframe_in_sql_in_chunks(
             table_action = 'append'
 
 
-def query_list_from_file(sql_file: str) -> list[str]:
+def query_list_from_file(sql_file: str) -> ty.List[str]:
     '''
     This returns a list of queries from an SQL file
     '''
@@ -723,8 +723,8 @@ def query_list_from_file(sql_file: str) -> list[str]:
 
 
 def dataframes_from_query_list(
-    query_list: list[str], sql_connection: sqlite3.Connection
-) -> list[pd.DataFrame]:
+    query_list: ty.List[str], sql_connection: sqlite3.Connection
+) -> ty.List[pd.DataFrame]:
     '''
     This returns a list of dataframes, each obtained from a query in the list
     '''
@@ -755,9 +755,9 @@ def from_grib_to_dataframe(grib_file: str) -> pd.DataFrame:
 def read_query_generator(
     quantities_to_display: str,
     source_table: str,
-    query_filter_quantities: list[str],
-    query_filter_types: list[str],
-    query_filter_values: list[str],
+    query_filter_quantities: ty.List[str],
+    query_filter_types: ty.List[str],
+    query_filter_values: ty.List[str],
 ) -> str:
     '''
     This function returns an sql read/select query string that can be used
@@ -821,7 +821,7 @@ def read_query_generator(
     return output_query
 
 
-def database_tables_columns(database: str) -> dict:
+def database_tables_columns(database: str) -> ty.Dict:
     '''
     Returns a dictionary with the tables of a database as keys and their
     columns as values.
@@ -874,7 +874,7 @@ def string_to_float(my_string: str) -> float:
     return my_output
 
 
-def get_map_area_data(parameters: dict) -> pd.DataFrame:
+def get_map_area_data(parameters: ty.Dict) -> pd.DataFrame:
     '''
     This function gets and processes the area data and sets it
     into a DataFrame. It contains polygons/multipolygons
@@ -902,7 +902,7 @@ def get_map_area_data(parameters: dict) -> pd.DataFrame:
     return area_data
 
 
-def get_map_borders(NUTS_level: int, parameters: dict) -> pd.DataFrame:
+def get_map_borders(NUTS_level: int, parameters: ty.Dict) -> pd.DataFrame:
     '''
     This function gets the borders/contours of regions at a specified NUTS
     level.
@@ -921,7 +921,7 @@ def get_map_borders(NUTS_level: int, parameters: dict) -> pd.DataFrame:
     return border_data
 
 
-def get_map_points(NUTS_level: int, parameters: dict) -> pd.DataFrame:
+def get_map_points(NUTS_level: int, parameters: ty.Dict) -> pd.DataFrame:
     '''
     This function gets the points/labels of regions at a specified NUTS
     level.
@@ -943,10 +943,10 @@ def get_map_points(NUTS_level: int, parameters: dict) -> pd.DataFrame:
 def make_spider_chart(
     spider_plot: matplotlib.projections.polar.PolarAxes,
     series_label: str,
-    data_labels: list[str],
-    data_values: list[float],
-    ticks: list[float],
-    tick_labels: list[str],
+    data_labels: ty.List[str],
+    data_values: ty.List[float],
+    ticks: ty.List[float],
+    tick_labels: ty.List[str],
     spider_color: str,
     spider_marker: str,
     spider_linewidth: float,
@@ -992,11 +992,11 @@ def make_spider_chart(
 def update_database_table(
     database_to_update: str,
     table_to_update: str,
-    columns_to_update: list[str],
-    new_values: list[Any],
-    query_filter_quantities: list[str],
-    query_filter_types: list[str],
-    query_filter_values: list[str],
+    columns_to_update: ty.List[str],
+    new_values: ty.List[ty.Any],
+    query_filter_quantities: ty.List[str],
+    query_filter_types: ty.List[str],
+    query_filter_values: ty.List[str],
 ) -> None:
     '''
     This function updates the values
@@ -1045,10 +1045,10 @@ def update_database_table(
     set_query = ''
     for set_element, element_values in zip(columns_to_update, new_values):
         if first_set:
-            set_query += f'set '
+            set_query += 'set '
             first_set = False
         else:
-            set_query += f', '
+            set_query += ', '
 
         set_query += f'{set_element} = {element_values}'
 
@@ -1067,9 +1067,9 @@ def update_database_table(
 
 
 def make_query_filter(
-    query_filter_quantities: list[str],
-    query_filter_types: list[str],
-    query_filter_values: list[str],
+    query_filter_quantities: ty.List[str],
+    query_filter_types: ty.List[str],
+    query_filter_values: ty.List[str],
 ) -> str:
     '''
     Returns a query filter stringthat can be used in an SQL query.
@@ -1109,7 +1109,7 @@ def make_query_filter(
         query_filter_quantities, query_filter_types, query_filter_values
     ):
         if first_filter:
-            query_filter = f'where '
+            query_filter = 'where '
             first_filter = False
         else:
             query_filter = f'{query_filter} and'
@@ -1169,7 +1169,7 @@ def read_table_from_database(
 def put_dataframe_in_word_document(
     dataframe_to_put: pd.DataFrame,
     word_document_name: str,
-    number_formats: list[str] = ['.2f'],
+    number_formats: ty.List[str] = ['.2f'],
     table_style: str = 'Normal Table',
     empty_code: str = '',
     cell_font_size: int = 11,
@@ -1392,7 +1392,7 @@ def clear_word_document(document_file_name: str) -> None:
     target_document.save(document_file_name)
 
 
-def get_rgb_255_code_string(color_name: str, parameters: dict) -> str:
+def get_rgb_255_code_string(color_name: str, parameters: ty.Dict) -> str:
     '''
     Creates a string with rgb values (0-255),
     rgb(111, 233, 66)
@@ -1413,8 +1413,8 @@ def make_quantity_map(
     map_areas: pd.DataFrame,
     quantity_plot: matplotlib.axes.Axes,
     quantity_color: str,
-    map_grid_plot_parameters: dict,
-    parameters: dict,
+    map_grid_plot_parameters: ty.Dict,
+    parameters: ty.Dict,
 ) -> None:
     '''
     Makes one of the quantity maps in a map grid.
@@ -1474,10 +1474,10 @@ def make_quantity_map(
 
 
 def map_grid(
-    quantities_data: list[pd.DataFrame],
-    quantity_display_names: list[str],
-    quantity_colors: list[str],
-    parameters: dict,
+    quantities_data: ty.List[pd.DataFrame],
+    quantity_display_names: ty.List[str],
+    quantity_colors: ty.List[str],
+    parameters: ty.Dict,
 ) -> None:
     '''
     This function creates a grid of maps. You need to give it the data you want
@@ -1575,10 +1575,10 @@ def map_grid(
 def put_plots_on_map(
     map_figure: matplotlib.figure.Figure,
     map_data: pd.DataFrame,
-    map_parameters: dict,
+    map_parameters: ty.Dict,
     plot_y_total_values: pd.DataFrame,
     projection_type: str | None = None,
-) -> dict[str, matplotlib.axes.Axes]:
+) -> ty.Dict[str, matplotlib.axes.Axes]:
     '''
     Puts plots/axes on a map figure. You can then draw in these.
     The plot_y_total_values are the sizes of the plots per country (for example
@@ -1622,7 +1622,7 @@ def put_plots_on_map(
 
     # We create a dictionary that contains a plot/axis on top for each
     # location
-    plots_on_top: dict[str, matplotlib.axes.Axes] = {}
+    plots_on_top: ty.Dict[str, matplotlib.axes.Axes] = {}
 
     # We iterate through the locations
     for location in map_data.index:
@@ -1650,7 +1650,7 @@ def put_plots_on_map(
 
 
 def rgba_code_color(
-    color_rgb: tuple[int, int, int], color_opacity: float
+    color_rgb: ty.Tuple[int, int, int], color_opacity: float
 ) -> str:
     '''
     Gets an RGBA string from a color RGB tuple.
@@ -1668,11 +1668,11 @@ def rgba_code_color(
 
 
 def make_sankey(
-    nodes: dict,
-    links: dict,
+    nodes: ty.Dict,
+    links: ty.Dict,
     sankey_title: str,
     output_folder: str,
-    parameters: dict,
+    parameters: ty.Dict,
 ) -> None:
     '''
     Makes a Sankey plot in plotly (comes out as an html file).
