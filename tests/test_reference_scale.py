@@ -1,6 +1,6 @@
 import typing as ty
 
-from ETS_CookBook import ETS_CookBook as cook
+import ETS_CookBook as cook
 
 
 def test_basic() -> None:

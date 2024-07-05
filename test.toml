@@ -23,3 +23,12 @@ TNO_digital_blue = [102, 190, 204]
 TNO_safe_purple = [141, 112, 204]
 TNO_healthy_yellow = [245, 200, 20]
 TNO_light_orange = [255, 169, 112]
+
+
+# Defining color bars with lists of colors they use
+[color_bars]
+kraken = [
+    'kraken_deep_sea_blue', 'kraken_boundless_blue',
+    'kraken_shadow_blue', 'kraken_ice_blue']
+Mopo_to_light = ['Mopo_darkest', 'Mopo_dark', 'Mopo_light', 'Mopo_lightest']
+Mopo_to_dark = ['Mopo_lightest', 'Mopo_light', 'Mopo_dark', 'Mopo_darkest']

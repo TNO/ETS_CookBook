@@ -8,7 +8,8 @@ and returns a DataFrame containing the values of that table.
 Note that if the name does not exist (or is spelled wrongly (it's
 case-sensitive), the function will crash).
 The optional load_data_only parameter puts values in the table if set to
-True (its default value. A False value loads formulas)
+True (its default value. A False value loads formulas).
+
 ## Inputs
 ### table_name
 ### Excel_file

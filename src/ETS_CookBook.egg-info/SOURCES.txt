@@ -65,7 +65,6 @@ src/ETS_CookBook/ETS_CookBook.egg-info/requires.txt
 src/ETS_CookBook/ETS_CookBook.egg-info/top_level.txt
 src/ETS_CookBook/__pycache__/ETS_CookBook.cpython-312.pyc
 temp/github-workflow.yml
-tests/__init__.py
 tests/test_make_spider_chart.py
 tests/test_reference_scale.py
 tests/__pycache__/__init__.cpython-312.pyc

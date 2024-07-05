@@ -17,7 +17,7 @@ nav:
   - Office documents:
     - DataFrame to Excel: dataframe_to_Excel.md
     - DataFrame from Excel table name: dataframe_from_Excel_table_name.md
-    - Put DataFRame in Word document: put_dataframe_in_word_document.md
+    - Put DataFrame in Word document: put_dataframe_in_word_document.md
     - Make cell text vertical: make_cell_text_vertical.md
     - Delete Word element: delete_word_element.md
     - Clear Word document: clear_word_document.md
@@ -38,7 +38,7 @@ nav:
     - Check if folder exists: check_if_folder_exists.md
     - Save figure: save_figure.md
     - Save DataFrame: save_dataframe.md
-    - From grub to DataFrame: from_grib_to_dataframe.md
+    - From grib to DataFrame: from_grib_to_dataframe.md
     - Download and save file: download_and_save_file.md
   - Color management:
     - Get extra colors: get_extra_colors.md

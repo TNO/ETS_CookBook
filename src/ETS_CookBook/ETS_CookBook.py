@@ -88,14 +88,19 @@ import typing as ty
 import zipfile
 
 import docx
+import docx.document
 import geopandas as gpd
 import matplotlib
 import matplotlib.axes
+import matplotlib.colors
 import matplotlib.figure
 import matplotlib.projections
 import matplotlib.pyplot as plt
 import numpy as np
 import openpyxl
+import openpyxl.worksheet
+import openpyxl.worksheet.cell_range
+import openpyxl.worksheet.table
 import pandas as pd
 import plotly.graph_objects as go
 import requests
@@ -120,14 +125,14 @@ def check_if_folder_exists(folder_to_check: str) -> None:
         os.makedirs(folder_to_check)
 
 
-def parameters_from_TOML(parameters_file_name: str) -> ty.Dict:
+def parameters_from_TOML(parameters_file_name: str) -> ty.Dict[str, ty.Any]:
     '''
     Reads a TOML parameters file name and returns a parameters
     dictionary.
     '''
 
     with open(parameters_file_name, mode='rb') as parameters_file:
-        parameters: ty.Dict = tomllib.load(parameters_file)
+        parameters: ty.Dict[str, ty.Any] = tomllib.load(parameters_file)
 
     return parameters
 
@@ -197,27 +202,27 @@ def dataframe_from_Excel_table_name(
         if table_name in worksheet.tables:
             table_worksheet = worksheet
 
-    table = table_worksheet.tables[table_name]
-    table_range = table_worksheet[table.ref]
+    table: openpyxl.worksheet.table.Table = table_worksheet.tables[table_name]
+    table_range: ty.Tuple = table_worksheet[table.ref]
 
-    table_entries = [
+    table_entries: ty.List[ty.List] = [
         [cell_entry.value for cell_entry in row_entry]
         for row_entry in table_range
     ]
 
-    table_headers = table_entries[0]
-    table_values = table_entries[1:]
+    table_headers: ty.List[str] = table_entries[0]
+    table_values: ty.List[ty.Any] = table_entries[1:]
 
     # We need to go thhrough a dictionary, as passing the values directly
     # leads to duplicates with no index, for some reason
-    table_dictionary = {}
+    table_dictionary: ty.Dict[str, ty.Any] = {}
     for header_index, header in enumerate(table_headers):
-        values_for_header = [
+        values_for_header: ty.List[ty.Any] = [
             table_row[header_index] for table_row in table_values
         ]
         table_dictionary[header] = values_for_header
 
-    table_dataframe = pd.DataFrame.from_dict(table_dictionary)
+    table_dataframe: pd.DataFrame = pd.DataFrame.from_dict(table_dictionary)
 
     return table_dataframe
 
@@ -313,7 +318,7 @@ def register_color_bars(parameters: ty.Dict) -> None:
     # We fill the color bar dictionary
     for color_bar in color_bars:
         # We read the color list
-        color_bar_colors = color_bars[color_bar]
+        color_bar_colors: ty.List[str] = color_bars[color_bar]
         # We set the color steps, based on the color list
         color_steps: np.ndarray = np.linspace(0, 1, len(color_bar_colors))
 
@@ -325,10 +330,10 @@ def register_color_bars(parameters: ty.Dict) -> None:
             # It is a list so that we can append,
             # but we will need to convert it to a tuple
             base_color_entries = []
-            for color_bar_index, (color_step, color_bar_color) in enumerate(
-                zip(color_steps, color_bar_colors)
+            for color_step, color_bar_color in zip(
+                color_steps, color_bar_colors
             ):
-                # We get the ton by getting the RGB values of the
+                # We get the tone by getting the RGB values of the
                 # color bar color and taking the corresponding base index
                 color_bar_color_tone = get_rgb_from_name(
                     color_bar_color, parameters
@@ -342,13 +347,14 @@ def register_color_bars(parameters: ty.Dict) -> None:
                         # for the color corresponding
                         # to the step
                         color_bar_color_tone,
-                        # This iis repeated for continuous schemes
+                        # This is repeated for continuous schemes
                         # See
                         # https://matplotlib.org/stable/gallery/color/custom_cmap.html
                         # for details
                         color_bar_color_tone,
                     )
                 )
+
             # We now convert the list to a tuple and put it into
             # the dictionary
             color_bar_dictionary[color_bar][base_color] = tuple(
@@ -358,8 +364,10 @@ def register_color_bars(parameters: ty.Dict) -> None:
     # We now add the color bars to the color maps
 
     for color_bar in color_bars:
-        color_bar_to_register = matplotlib.colors.LinearSegmentedColormap(
-            color_bar, color_bar_dictionary[color_bar]
+        color_bar_to_register: matplotlib.colors.LinearSegmentedColormap = (
+            matplotlib.colors.LinearSegmentedColormap(
+                color_bar, color_bar_dictionary[color_bar]
+            )
         )
 
         if color_bar_to_register.name not in matplotlib.pyplot.colormaps():
@@ -374,10 +382,12 @@ def get_season(time_stamp: datetime.datetime) -> str:
     # We take the date of the timestamp to avoid issues
     # during the transitions (where the timestamp would be
     # larger than the previous season's end, which is at midnight)
-    date = datetime.datetime(
+    date: datetime.datetime = datetime.datetime(
         time_stamp.year, time_stamp.month, time_stamp.day, 0, 0
     )
-    seasons = [
+    seasons: ty.List[
+        ty.Tuple[str, ty.Tuple[datetime.datetime, datetime.datetime]]
+    ] = [
         (
             'winter',
             (
@@ -416,7 +426,7 @@ def get_season(time_stamp: datetime.datetime) -> str:
     ]
     for season, (start, end) in seasons:
         if start <= date <= end:
-            result_season = season
+            result_season: str = season
     return result_season
 
 
@@ -433,10 +443,10 @@ def save_figure(
     '''
 
     check_if_folder_exists(output_folder)
-    file_parameters = parameters['files']
-    figure_parameters = file_parameters['figures']
-    dpi_to_use = figure_parameters['dpi']
-    outputs = figure_parameters['outputs']
+    file_parameters: ty.Dict = parameters['files']
+    figure_parameters: ty.Dict = file_parameters['figures']
+    dpi_to_use: int = figure_parameters['dpi']
+    outputs: ty.Dict[str, bool] = figure_parameters['outputs']
 
     for file_type in outputs:
         if outputs[file_type]:
@@ -482,10 +492,12 @@ def save_dataframe(
     '''
 
     check_if_folder_exists(output_folder)
-    file_parameters = parameters['files']
-    dataframe_outputs = file_parameters['dataframe_outputs']
+    file_parameters: ty.Dict = parameters['files']
+    dataframe_outputs: ty.Dict[str, bool] = file_parameters[
+        'dataframe_outputs'
+    ]
 
-    file_types = [
+    file_types: ty.List[str] = [
         'csv',
         'json',
         'html',
@@ -508,7 +520,7 @@ def save_dataframe(
     # Note that clipboard does not produce a file,
     # but can still be used locally, so the function supports it.
 
-    file_extensions = [
+    file_extensions: ty.List[str] = [
         'csv',
         'json',
         'html',
@@ -526,7 +538,7 @@ def save_dataframe(
 
     # This determines if the dataframe is saved into its own file
     # or into a group file (such as a database or an Excel Workbook)
-    is_groupfile_per_type = [
+    is_groupfile_per_type: ty.List[bool] = [
         False,
         False,
         False,
@@ -549,7 +561,7 @@ def save_dataframe(
         # we need to forgo list compreshension and use
         # copies of the dataframe that we will modify
 
-        dataframe_to_use = dataframe.copy()
+        dataframe_to_use: pd.DataFrame = dataframe.copy()
 
         if file_type == 'feather':
             # feather does not support serializing
@@ -573,7 +585,9 @@ def save_dataframe(
             # as it needs column headers to be strings to work,
             # but other file types don't need all this and thus
             # can still use column headers that aren't strings
-            code_for_invalid_characters = '[^0-9a-zA-Z_.]'
+            code_for_invalid_characters: ty.Literal['[^0-9a-zA-Z_.]'] = (
+                '[^0-9a-zA-Z_.]'
+            )
 
             dataframe_to_use.columns = dataframe_to_use.columns.str.replace(
                 code_for_invalid_characters, '_', regex=True
@@ -594,7 +608,7 @@ def save_dataframe(
                         for old_name in dataframe_to_use.index.names
                     ]
 
-        function_name = f'to_{file_type}'
+        function_name: str = f'to_{file_type}'
 
         if file_type == 'latex':
             # In future versions `DataFrame.to_latex` is expected to
@@ -608,7 +622,7 @@ def save_dataframe(
         else:
             file_functions.append(getattr(dataframe_to_use, function_name))
 
-    using_file_types = [
+    using_file_types: ty.List[bool] = [
         dataframe_outputs[file_type] for file_type in file_types
     ]
 
@@ -627,7 +641,7 @@ def save_dataframe(
     ):
         if using_file_type:
             if is_groupfile:
-                file_to_use = (
+                file_to_use: str = (
                     f'{output_folder}/{groupfile_name}.{file_extension}'
                 )
 
@@ -640,7 +654,7 @@ def save_dataframe(
                     # file does not exist, so we need to check if the file
                     # exists
                     if os.path.exists(file_to_use):
-                        writer_to_use = pd.ExcelWriter(
+                        writer_to_use: pd.ExcelWriter = pd.ExcelWriter(
                             file_to_use,
                             engine='openpyxl',
                             mode='a',
@@ -703,7 +717,9 @@ def put_dataframe_in_sql_in_chunks(
             chunk_end = min(chunk_start + chunk_size, data_length)
             # We select the corresponding chunk in the dataframe and
             # write it to the SQL database
-            dataframe_chunk = source_dataframe.iloc[chunk_start:chunk_end]
+            dataframe_chunk: pd.DataFrame = source_dataframe.iloc[
+                chunk_start:chunk_end
+            ]
 
             dataframe_chunk.to_sql(
                 table_name, con=sql_connection, if_exists=table_action
@@ -751,7 +767,7 @@ def from_grib_to_dataframe(grib_file: str) -> pd.DataFrame:
     grib_engine: str = 'cfgrib'
 
     source_data: xr.Dataset = xr.load_dataset(grib_file, engine=grib_engine)
-    source_dataframe = source_data.to_dataframe()
+    source_dataframe: pd.DataFrame = source_data.to_dataframe()
 
     return source_dataframe
 
@@ -759,9 +775,9 @@ def from_grib_to_dataframe(grib_file: str) -> pd.DataFrame:
 def read_query_generator(
     quantities_to_display: str,
     source_table: str,
-    query_filter_quantities: ty.List[str],
-    query_filter_types: ty.List[str],
-    query_filter_values: ty.List[str],
+    query_filter_quantities: ty.List[str] = [''],
+    query_filter_types: ty.List[str] = [''],
+    query_filter_values: ty.List[str] = [''],
 ) -> str:
     '''
     This function returns an sql read/select query string that can be used
@@ -839,7 +855,7 @@ def database_tables_columns(database: str) -> ty.Dict:
     for table in database_tables:
         table_name: str = table[0]
         # table_name = f'"{table[0]}"'
-        table_cursor = database_connection.execute(
+        table_cursor: sqlite3.Cursor = database_connection.execute(
             f'select * from "{table_name}"'
         )
         tables_columns[table_name] = [
@@ -873,9 +889,9 @@ def string_to_float(my_string: str) -> float:
     Converts strings to floats, and to zero if the string is not a float.
     '''
     try:
-        my_output = float(my_string)
+        my_output: float = float(my_string)
     except ValueError:
-        my_output = 0
+        my_output = 0.0
 
     return my_output
 
@@ -1244,12 +1260,12 @@ def put_dataframe_in_word_document(
 
     # We want to know how many rows are for column headers and how many
     # columns are for index/row headers
-    column_index_depth = dataframe_to_put.columns.nlevels
-    row_index_depth = dataframe_to_put.index.nlevels
+    column_index_depth: int = dataframe_to_put.columns.nlevels
+    row_index_depth: int = dataframe_to_put.index.nlevels
 
     # With these, we know how big our table has to be.
     # We create a table in the document
-    table_in_document = target_document.add_table(
+    table_in_document: docx.document.Table = target_document.add_table(
         rows=dataframe_to_put.shape[0] + column_index_depth,
         cols=dataframe_to_put.shape[1] + row_index_depth,
         style=table_style,
@@ -1417,10 +1433,10 @@ def get_rgb_255_code_string(color_name: str, parameters: ty.Dict) -> str:
     This is used for plotly.
     '''
     # We convert the color name to an RGB (0-255)
-    rgb_255 = 255 * get_rgb_from_name(color_name, parameters)
+    rgb_255: ty.List[float] = 255 * get_rgb_from_name(color_name, parameters)
     # We make it a string (and remove the 0 decimal via int conversion)
-    rgb_255_string = list(map(str, map(int, rgb_255)))
-    rgb_255_code_string = f'({", ".join(rgb_255_string)})'
+    rgb_255_list: ty.List[str] = list(map(str, map(int, rgb_255)))
+    rgb_255_code_string: str = f'({", ".join(rgb_255_list)})'
 
     return rgb_255_code_string
 
@@ -1438,28 +1454,30 @@ def make_quantity_map(
     Makes one of the quantity maps in a map grid.
     '''
     # We get some display parameters
-    no_data_color = get_rgb_from_name(
+    no_data_color: ty.List[float] = get_rgb_from_name(
         map_grid_plot_parameters['no_data_color'], parameters
     )
-    heat_bar_map = quantity_color
+    heat_bar_map: str = quantity_color
     values_column = map_grid_plot_parameters['values_column']
-    plot_title_font_size = map_grid_plot_parameters['plot_title_font_size']
-    map_x_range = map_grid_plot_parameters['map_x_range']
-    map_y_range = map_grid_plot_parameters['map_y_range']
+    plot_title_font_size: int = map_grid_plot_parameters[
+        'plot_title_font_size'
+    ]
+    map_x_range: ty.List[float] = map_grid_plot_parameters['map_x_range']
+    map_y_range: ty.List[float] = map_grid_plot_parameters['map_y_range']
 
     # We create a range for the values to display (for the
     # scale of the legend bar).
-    values_to_plot = plot_data[values_column].values
+    values_to_plot: np.ndarray = plot_data[values_column].values
 
-    lowest_value_to_plot = values_to_plot.min()
-    highest_value_to_plot = values_to_plot.max()
+    lowest_value_to_plot: float = values_to_plot.min()
+    highest_value_to_plot: float = values_to_plot.max()
 
-    display_reference_scale = reference_scale(
+    display_reference_scale: ty.List[float] = reference_scale(
         [lowest_value_to_plot, highest_value_to_plot], 1
     )
-    lowest_value_to_display = display_reference_scale[0]
-    highest_value_to_display = display_reference_scale[1]
-    color_bar_scale = matplotlib.colors.Normalize(
+    lowest_value_to_display: float = display_reference_scale[0]
+    highest_value_to_display: float = display_reference_scale[1]
+    color_bar_scale: matplotlib.colors.Normalize = matplotlib.colors.Normalize(
         vmin=lowest_value_to_display, vmax=highest_value_to_display
     )
 
@@ -1511,35 +1529,39 @@ def map_grid(
     '''
 
     # We read some parameters
-    file_parameters = parameters['files']
-    output_folder = file_parameters['output_folder']
+    file_parameters: ty.Dict = parameters['files']
+    output_folder: str = file_parameters['output_folder']
 
-    map_grid_plot_parameters = parameters['map_grid_plot']
-    isoA3_file = map_grid_plot_parameters['isoA3_file']
-    isoA3_codes = pd.read_csv(f'{isoA3_file}')
-    isoA3_dict = dict(zip(isoA3_codes['Country'], isoA3_codes['IsoA3']))
-    iso_A3_header = map_grid_plot_parameters['iso_A3_header']
-    iso_A3_header_in_map_data = map_grid_plot_parameters[
+    map_grid_plot_parameters: ty.Dict = parameters['map_grid_plot']
+    isoA3_file: str = map_grid_plot_parameters['isoA3_file']
+    isoA3_codes: pd.DataFrame = pd.read_csv(f'{isoA3_file}')
+    isoA3_dict: ty.Dict[str, str] = dict(
+        zip(isoA3_codes['Country'], isoA3_codes['IsoA3'])
+    )
+    iso_A3_header: str = map_grid_plot_parameters['iso_A3_header']
+    iso_A3_header_in_map_data: str = map_grid_plot_parameters[
         'iso_A3_header_in_map_data'
     ]
 
-    figure_title = map_grid_plot_parameters['figure_title']
+    figure_title: str = map_grid_plot_parameters['figure_title']
 
-    number_of_rows = map_grid_plot_parameters['rows']
-    number_of_columns = map_grid_plot_parameters['columns']
-    map_data_folder = map_grid_plot_parameters['map_data_folder']
-    map_data_file = map_grid_plot_parameters['map_data_file']
-    zero_color = map_grid_plot_parameters['zero_color']
+    number_of_rows: int = map_grid_plot_parameters['rows']
+    number_of_columns: int = map_grid_plot_parameters['columns']
+    map_data_folder: str = map_grid_plot_parameters['map_data_folder']
+    map_data_file: str = map_grid_plot_parameters['map_data_file']
+    zero_color: str = map_grid_plot_parameters['zero_color']
 
     # We register the color bars (one per quantity color)
 
-    color_bars = parameters['color_bars']
+    color_bars: ty.Dict = parameters['color_bars']
     for quantity_color in quantity_colors:
         color_bars[quantity_color] = [zero_color, quantity_color]
     register_color_bars(parameters)
 
     # We read the map data from a file
-    map_areas = gpd.read_file(f'{map_data_folder}/{map_data_file}')
+    map_areas: gpd.GeoDataFrame = gpd.read_file(
+        f'{map_data_folder}/{map_data_file}'
+    )
 
     # We create a figure with one plot (grid element) for each quantity
     # we want to display
@@ -1560,14 +1582,16 @@ def map_grid(
         )
     ):
         # We determine the row and column where the quantity plot will go
-        quantity_row = quantity_index // number_of_columns
-        quantity_column = quantity_index % number_of_columns
-        quantity_plot = quantity_plots[quantity_row][quantity_column]
+        quantity_row: int = quantity_index // number_of_columns
+        quantity_column: int = quantity_index % number_of_columns
+        quantity_plot: matplotlib.axes.Axes = quantity_plots[quantity_row][
+            quantity_column
+        ]
 
         # We remap the country name in the data to its ISO A3 code
         quantity_data[iso_A3_header] = quantity_data['Country'].map(isoA3_dict)
         # We create the plot data
-        plot_data = pd.merge(
+        plot_data: pd.DataFrame = pd.merge(
             map_areas,
             quantity_data,
             left_on=iso_A3_header_in_map_data,
@@ -1603,16 +1627,20 @@ def put_plots_on_map(
     the size of the stacked bar for a stacked bar plot).
     '''
 
-    location_code_header = map_parameters['location_code_header']
+    location_code_header: str = map_parameters['location_code_header']
     map_data = map_data.set_index(location_code_header)
 
     # We get the latitudes and longitudes of the locations (countries, e.g.)
-    location_longitudes_header = map_parameters['location_longitudes_header']
-    location_latitudes_header = map_parameters['location_latitudes_header']
+    location_longitudes_header: str = map_parameters[
+        'location_longitudes_header'
+    ]
+    location_latitudes_header: str = map_parameters[
+        'location_latitudes_header'
+    ]
     map_data['latitude'] = map_data[location_latitudes_header].values
     map_data['longitude'] = map_data[location_longitudes_header].values
 
-    scaling_parameters = map_parameters['scaling_parameters']
+    scaling_parameters: ty.Dict = map_parameters['scaling_parameters']
     # These parameters determine the size and location parameters to place
     # the plots and the necessary scaling factors. These should be adapted
     # if the plots don't come at the right place (they can change
@@ -1628,15 +1656,15 @@ def put_plots_on_map(
     # latitude_scaling = 0.47
     # maximum_longitude = 180
     # maximum_latitude = 90
-    x_size = scaling_parameters['x_size']
-    y_size_max = scaling_parameters['y_size_max']
-    y_size_scale = scaling_parameters['y_size_scale']
-    x_start = scaling_parameters['x_start']
-    y_start = scaling_parameters['y_start']
-    longitude_scaling = scaling_parameters['longitude_scaling']
-    latitude_scaling = scaling_parameters['latitude_scaling']
-    maximum_longitude = scaling_parameters['maximum_longitude']
-    maximum_latitude = scaling_parameters['maximum_latitude']
+    x_size: float = scaling_parameters['x_size']
+    y_size_max: float = scaling_parameters['y_size_max']
+    y_size_scale: float = scaling_parameters['y_size_scale']
+    x_start: float = scaling_parameters['x_start']
+    y_start: float = scaling_parameters['y_start']
+    longitude_scaling: float = scaling_parameters['longitude_scaling']
+    latitude_scaling: float = scaling_parameters['latitude_scaling']
+    maximum_longitude: float = scaling_parameters['maximum_longitude']
+    maximum_latitude: float = scaling_parameters['maximum_latitude']
 
     # We create a dictionary that contains a plot/axis on top for each
     # location
@@ -1647,8 +1675,8 @@ def put_plots_on_map(
 
         # We check that there are values to plot for the location
         if location in plot_y_total_values.index:
-            latitude = map_data.loc[location]['latitude']
-            longitude = map_data.loc[location]['longitude']
+            latitude: float = map_data.loc[location]['latitude']
+            longitude: float = map_data.loc[location]['longitude']
             y_size = (
                 plot_y_total_values.loc[location] * y_size_scale / y_size_max
             )
@@ -1668,7 +1696,7 @@ def put_plots_on_map(
 
 
 def rgba_code_color(
-    color_rgb: ty.Tuple[int, int, int], color_opacity: float
+    color_rgb: ty.Tuple[int, ...], color_opacity: float
 ) -> str:
     '''
     Gets an RGBA string from a color RGB tuple.
@@ -1686,8 +1714,8 @@ def rgba_code_color(
 
 
 def make_sankey(
-    nodes: ty.Dict,
-    links: ty.Dict,
+    nodes: pd.DataFrame,
+    links: pd.DataFrame,
     sankey_title: str,
     output_folder: str,
     parameters: ty.Dict,
@@ -1697,17 +1725,17 @@ def make_sankey(
     The nodes and links are in a DataFrame
     '''
 
-    node_parameters = parameters['Sankey']['nodes']
+    node_parameters: ty.Dict = parameters['Sankey']['nodes']
 
-    label_padding = node_parameters['label_padding']
-    label_alignement = node_parameters['label_alignement']
+    label_padding: int = node_parameters['label_padding']
+    label_alignement: str = node_parameters['label_alignement']
 
-    node_labels_names_only = pd.Series(nodes['Label'])
-    display_values = node_parameters['display_values']
+    node_labels_names_only: ty.List[str] = pd.Series(nodes['Label']).to_list()
+    display_values: bool = node_parameters['display_values']
     if display_values:
-        values_to_add = nodes['Value']
-        unit = node_parameters['unit']
-        node_labels = []
+        values_to_add: pd.Series[float] = nodes['Value']
+        unit: str = node_parameters['unit']
+        node_labels: ty.List[str] = []
         for node_label, value_to_add in zip(
             node_labels_names_only, values_to_add
         ):
@@ -1715,43 +1743,45 @@ def make_sankey(
     else:
         node_labels = node_labels_names_only
 
-    node_x_positions = nodes['X position']
-    node_y_positions = nodes['Y position']
-    node_colors = nodes['Color']
-    node_color_dict = dict(zip(node_labels_names_only, node_colors))
-    color_names = parameters['colors']
+    node_x_positions: pd.Series[float] = nodes['X position']
+    node_y_positions: pd.Series[float] = nodes['Y position']
+    node_colors: pd.Series[str] = nodes['Color']
+    node_color_dict: ty.Dict[str, str] = dict(
+        zip(node_labels_names_only, node_colors)
+    )
+    color_names: ty.Dict[str, ty.List[int]] = parameters['colors']
 
-    node_colors_rgba_codes = []
+    node_colors_rgba_codes: ty.List[str] = []
     for node_color in node_colors:
-        color_opacity = 1
-        color_rgb = color_names[node_color]
+        color_opacity: float = 1
+        color_rgb: ty.Tuple[int, ...] = tuple(color_names[node_color])
         node_colors_rgba_codes.append(
             rgba_code_color(color_rgb, color_opacity)
         )
 
-    link_parameters = parameters['Sankey']['links']
+    link_parameters: ty.Dict[str, ty.Any] = parameters['Sankey']['links']
 
-    link_sources = links['Source']
-    link_source_indices = [
+    link_sources: pd.Series = links['Source']
+    link_source_indices: ty.List[int] = [
         node_labels_names_only[node_labels_names_only == source].index[0]
         for source in link_sources
     ]
 
-    link_targets = links['Target']
-    link_target_indices = [
+    link_targets: pd.Series = links['Target']
+    link_target_indices: ty.List[int] = [
         node_labels_names_only[node_labels_names_only == target].index[0]
         for target in link_targets
     ]
-    value_scaling_factor = link_parameters['value_scaling_factor']
-    link_values_unscaled = links['Value']
-    link_values = [
+    value_scaling_factor: float = link_parameters['value_scaling_factor']
+    link_values_unscaled: pd.Series = links['Value']
+    link_values: ty.List[float] = [
         link_value / value_scaling_factor
         for link_value in link_values_unscaled
     ]
-    link_colors = links['Color']
-    link_opacities = links['Opacity']
-    link_labels = links['Label']
-    link_colors_rgba_codes = []
+    link_colors: pd.Series[str] = links['Color']
+    link_opacities: pd.Series[float] = links['Opacity']
+    link_labels: pd.Series[str] = links['Label']
+    link_colors_rgba_codes: ty.List[str] = []
     for link_color, link_opacity, source, target, link_label in zip(
         link_colors,
         link_opacities,
@@ -1765,10 +1795,10 @@ def make_sankey(
         elif link_color == 'target':
             link_color = node_color_dict[target]
 
-        color_rgb = color_names[link_color]
+        color_rgb = tuple(color_names[link_color])
         link_colors_rgba_codes.append(rgba_code_color(color_rgb, link_opacity))
 
-    sankey_figure = go.Figure(
+    sankey_figure: go.Figure = go.Figure(
         go.Sankey(
             # arrangement='snap',
             node=dict(
@@ -1788,7 +1818,7 @@ def make_sankey(
             ),
         )
     )
-    title_size = parameters['Sankey']['title_size']
+    title_size: int = parameters['Sankey']['title_size']
     sankey_figure.update_layout(
         title=dict(
             text=f'{sankey_title}',
@@ -1806,3 +1836,9 @@ if __name__ == '__main__':
     parameters = parameters_from_TOML(parameters_file_name)
     print('Make parameters input more specific')
     print('Open issues')
+    dataframe_from_Excel_table_name('Test_Table', 'Standard_Excel.xlsm')
+    parameters_file_name = 'test.toml'
+    parameters = parameters_from_TOML(parameters_file_name)
+    # register_color_bars(parameters)
+    zoo, zaa = plt.subplots(2, 2)
+    print(type(zaa))
