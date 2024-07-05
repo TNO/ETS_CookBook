@@ -687,11 +687,11 @@ def put_dataframe_in_sql_in_chunks(
     '''
 
     # We first need the total data/index length of the Dataframe
-    data_length = len(source_dataframe.index)
+    data_length: int = len(source_dataframe.index)
 
     # We initialise the chunk boundaries and the sql connection
-    chunk_start = 0
-    chunk_end = 0
+    chunk_start: int = 0
+    chunk_end: int = 0
 
     with sqlite3.connect(sql_file) as sql_connection:
         if drop_existing_table:
@@ -1119,8 +1119,8 @@ def make_query_filter(
         3) In provide the two tuple values into a list.,
         e.g: [(52.1,4.9),(52.0,5.1)]
     '''
-    first_filter = True
-    query_filter = ''
+    first_filter: bool = True
+    query_filter: str = ''
     for filter_quantity, filter_type, filter_value in zip(
         query_filter_quantities, query_filter_types, query_filter_values
     ):
@@ -1175,9 +1175,11 @@ def read_table_from_database(
     dataframe
     '''
     with sqlite3.connect(database_file) as sql_connection:
-        table_query = read_query_generator('*', f'"{table_name}"', [], [], [])
+        table_query: str = read_query_generator(
+            '*', f'"{table_name}"', [], [], []
+        )
 
-        table_to_read = pd.read_sql(table_query, sql_connection)
+        table_to_read: pd.DataFrame = pd.read_sql(table_query, sql_connection)
 
     return table_to_read
 
@@ -1673,7 +1675,7 @@ def rgba_code_color(
     This is useful for plotly.
     The A part is the color opacity.
     '''
-    rgba_string = (
+    rgba_string: str = (
         f'rgba('
         f'{color_rgb[0]},'
         f'{color_rgb[1]},'
