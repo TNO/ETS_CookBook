@@ -777,7 +777,8 @@ def read_query_generator(
     source_table: str,
     query_filter_quantities: ty.List[str] = [''],
     query_filter_types: ty.List[str] = [''],
-    query_filter_values: ty.List[str] = [''],
+    query_filter_values: ty.List = [''],
+    # This can be a List of strings, or a nested list (see explanations)
 ) -> str:
     '''
     This function returns an sql read/select query string that can be used
@@ -1834,11 +1835,7 @@ if __name__ == '__main__':
 
     parameters_file_name = 'test.toml'
     parameters = parameters_from_TOML(parameters_file_name)
-    print('Make parameters input more specific')
-    print('Open issues')
-    dataframe_from_Excel_table_name('Test_Table', 'Standard_Excel.xlsm')
-    parameters_file_name = 'test.toml'
-    parameters = parameters_from_TOML(parameters_file_name)
-    # register_color_bars(parameters)
-    zoo, zaa = plt.subplots(2, 2)
-    print(type(zaa))
+    # dataframe_from_Excel_table_name('Test_Table', 'Standard_Excel.xlsm')
+    # check if WB and table exist. If not, return empty DF (with error message
+    #  (in it?))
+    # or throw an error

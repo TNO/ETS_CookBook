@@ -1,3 +1,6 @@
+# Type hinting here seems to create issues
+# Either with MyPy complaining about imports mising attributes
+# or MyPy not working
 import matplotlib.pyplot as plt
 
 import ETS_CookBook as cook

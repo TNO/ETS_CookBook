@@ -3,11 +3,13 @@ LICENCE
 LICENSE
 MOPO_logo_main.svg
 README.md
+Standard_Excel.xlsm
 eu-emblem-low-res.jpg
 mkdocs.yml
 pyproject.toml
 requirements.txt
 test.toml
+.vscode/ltex.dictionary.en-US.txt
 docs/MOPO_logo_main.svg
 docs/MOPO_logo_main_onwhite.svg
 docs/check_if_folder_exists.md
@@ -69,4 +71,5 @@ tests/test_make_spider_chart.py
 tests/test_reference_scale.py
 tests/__pycache__/__init__.cpython-312.pyc
 tests/__pycache__/test_make_spide_chart.cpython-312-pytest-8.2.2.pyc
+tests/__pycache__/test_make_spider_chart.cpython-312-pytest-8.2.2.pyc
 tests/__pycache__/test_reference_scale.cpython-312-pytest-8.2.2.pyc
