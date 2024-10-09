@@ -1,0 +1,53 @@
+site_name: ETS CookBook
+nav:
+  - Home: index.md
+  - Plotting:
+    - Make spider chart: make_spider_chart.md
+    - Map grid: map_grid.md
+    - Make quantity map: make_quantity_map.md
+    - Put plots on map: put_plots_on_map.md
+    - Make Sankey: make_sankey.md
+  - Maps:
+    - Get map area data: get_map_area_data.md
+    - Get map borders data: get_map_borders_data.md
+    - Get map points data: get_map_points_data.md
+    - Map grid: map_grid.md
+    - Make quantity map: make_quantity_map.md
+    - Put plots on map: put_plots_on_map.md
+  - Office documents:
+    - DataFrame to Excel: dataframe_to_Excel.md
+    - DataFrame from Excel table name: dataframe_from_Excel_table_name.md
+    - Put DataFrame in Word document: put_dataframe_in_word_document.md
+    - Make cell text vertical: make_cell_text_vertical.md
+    - Delete Word element: delete_word_element.md
+    - Clear Word document: clear_word_document.md
+  - Numbers and time:
+    - Reference scale: reference_scale.md
+    - Get season: get_season.md
+    - String to float: string_to_float.md
+  - Databases/queries/SQL:
+    - Put DataFrame in SQL in chunks: put_dataframe_in_sql_in_chunks.md
+    - Query list from file: query_list_from_file.md
+    - DataFrames from query list: dataframes_from_query_list.md
+    - Read query generator: read_query_generator.md
+    - Database tables columns: database_tables_columns.md
+    - Update database table: update_database_table.md
+    - Read table from database: read_table_from_database.md
+  - File Management:
+    - Parameters from TOML: parameters_from_TOML.md
+    - Check if folder exists: check_if_folder_exists.md
+    - Save figure: save_figure.md
+    - Save DataFrame: save_dataframe.md
+    - From grib to DataFrame: from_grib_to_dataframe.md
+    - Download and save file: download_and_save_file.md
+  - Color management:
+    - Get extra colors: get_extra_colors.md
+    - Get RGB from name: get_RGB_from_name.md
+    - RGB color list: rgb_color_list.md
+    - Register color bars: register_color_bars.md
+    - RGBA code color: rgba_code_color.md
+
+
+theme: 
+  name: readthedocs
+  sticky_navigation: False
