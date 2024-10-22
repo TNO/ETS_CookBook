@@ -11,8 +11,6 @@ pyproject.toml
 requirements.txt
 test.toml
 .vscode/ltex.dictionary.en-US.txt
-dist/ETS_CookBook-1.0.27-py3-none-any.whl
-dist/ets_cookbook-1.0.27.tar.gz
 docs/MOPO_logo_main.svg
 docs/MOPO_logo_main_onwhite.svg
 docs/check_if_folder_exists.md
@@ -30,7 +28,7 @@ docs/get_extra_colors.md
 docs/get_map_area_data.md
 docs/get_map_borders_data.md
 docs/get_map_points_data.md
-docs/get_nested_values.py
+docs/get_nested_values.md
 docs/get_rgb_255_code_string.md
 docs/get_season.md
 docs/index.md
