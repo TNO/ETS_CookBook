@@ -4,7 +4,6 @@ certifi==2024.6.2
 charset-normalizer==3.3.2
 click==8.1.7
 colorama==0.4.6
-contourpy==1.2.1
 cycler==0.12.1
 docutils==0.21.2
 docx==0.2.4

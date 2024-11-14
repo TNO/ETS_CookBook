@@ -6,7 +6,7 @@ build-backend = 'setuptools.build_meta'
 
 [project]
 name = 'ETS_CookBook'
-version = '1.0.32'
+version = '1.1.0'
 authors = [
   { name='Omar Usmani', email='Omar.Usmani@TNO.nl' },
 ]
@@ -29,7 +29,6 @@ dependencies = {file = ['requirements.txt']}
 
 [tool.setuptools.packages.find]
 where = ['src']
-tw
 [tool.pytest.ini_options]
 pythonpath = ['src/ETS_CookBook']
 

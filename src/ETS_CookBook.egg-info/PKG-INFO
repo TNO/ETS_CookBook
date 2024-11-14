@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: ETS_CookBook
-Version: 1.0.32
+Version: 1.1.0
 Summary: The ETS (TNO) CookBook of useful Python Scripts
 Author-email: Omar Usmani <Omar.Usmani@TNO.nl>
 Project-URL: Homepage, https://github.com/TNO/ETS_CookBook
@@ -17,7 +17,6 @@ Requires-Dist: certifi==2024.6.2
 Requires-Dist: charset-normalizer==3.3.2
 Requires-Dist: click==8.1.7
 Requires-Dist: colorama==0.4.6
-Requires-Dist: contourpy==1.2.1
 Requires-Dist: cycler==0.12.1
 Requires-Dist: docutils==0.21.2
 Requires-Dist: docx==0.2.4

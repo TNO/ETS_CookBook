@@ -6,9 +6,11 @@ https://tno.github.io/ETS_CookBook/
 '''
 
 import datetime
+import functools
 import math
 import os
 import sqlite3
+import time
 import typing as ty
 import zipfile
 
@@ -1779,6 +1781,26 @@ def set_nested_value(
     for key in key_list[:-1]:
         dictionary = dictionary.setdefault(key, {})
     dictionary[key_list[-1]] = value_to_set
+
+
+def function_timer(function_to_time: ty.Callable) -> ty.Callable:
+    @functools.wraps(function_to_time)
+    def time_wrapper(
+        *function_arguments: ty.Any, **function_keywaord_arguments: ty.Any
+    ) -> ty.Any:
+        timer_start: float = time.perf_counter()
+        function_result: ty.Any = function_to_time(
+            *function_arguments, **function_keywaord_arguments
+        )
+        timer_end: float = time.perf_counter()
+        function_run_time: float = timer_end - timer_start
+        print(
+            f'{function_to_time.__name__} took '
+            f'{function_run_time:.2f} seconds'
+        )
+        return function_result
+
+    return time_wrapper
 
 
 if __name__ == '__main__':
