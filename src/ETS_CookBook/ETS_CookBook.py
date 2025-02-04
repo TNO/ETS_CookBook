@@ -52,21 +52,21 @@ def check_if_folder_exists(folder_to_check: str) -> None:
         os.makedirs(folder_to_check)
 
 
-def parameters_from_TOML(parameters_file_name: str) -> ty.Dict[str, ty.Any]:
+def parameters_from_TOML(parameters_file_name: str) -> dict[str, ty.Any]:
     '''
     Reads a TOML parameters file name and returns a parameters
     dictionary.
     '''
 
     with open(parameters_file_name, mode='rb') as parameters_file:
-        parameters: ty.Dict[str, ty.Any] = tomllib.load(parameters_file)
+        parameters: dict[str, ty.Any] = tomllib.load(parameters_file)
 
     return parameters
 
 
 def reference_scale(
-    number_list: ty.List[float], digit_shift: int = 0
-) -> ty.List[float]:
+    number_list: list[float], digit_shift: int = 0
+) -> list[float]:
     '''
     This function takes a list of numbers and returns a scale
     (lower and upper boundary) they are in.
@@ -77,11 +77,11 @@ def reference_scale(
     (x-axis boundaries).
     '''
 
-    number_list_boundaries: ty.List[float] = [
+    number_list_boundaries: list[float] = [
         min(number_list),
         max(number_list),
     ]
-    boundary_powers_of_ten: ty.List[int] = [
+    boundary_powers_of_ten: list[int] = [
         (
             int(math.log10(abs(number))) - digit_shift
             # The first term gives us the power of ten of the highest digit,
@@ -92,7 +92,7 @@ def reference_scale(
         for number in number_list_boundaries
     ]
 
-    dividers: ty.List[float] = [
+    dividers: list[float] = [
         math.pow(10, power) for power in boundary_powers_of_ten
     ]
 
@@ -130,21 +130,21 @@ def dataframe_from_Excel_table_name(
             table_worksheet = worksheet
 
     table: openpyxl.worksheet.table.Table = table_worksheet.tables[table_name]
-    table_range: ty.Tuple = table_worksheet[table.ref]
+    table_range: tuple = table_worksheet[table.ref]
 
-    table_entries: ty.List[ty.List] = [
+    table_entries: list[list] = [
         [cell_entry.value for cell_entry in row_entry]
         for row_entry in table_range
     ]
 
-    table_headers: ty.List[str] = table_entries[0]
-    table_values: ty.List[ty.Any] = table_entries[1:]
+    table_headers: list[str] = table_entries[0]
+    table_values: list[ty.Any] = table_entries[1:]
 
     # We need to go thhrough a dictionary, as passing the values directly
     # leads to duplicates with no index, for some reason
-    table_dictionary: ty.Dict[str, ty.Any] = {}
+    table_dictionary: dict[str, ty.Any] = {}
     for header_index, header in enumerate(table_headers):
-        values_for_header: ty.List[ty.Any] = [
+        values_for_header: list[ty.Any] = [
             table_row[header_index] for table_row in table_values
         ]
         table_dictionary[header] = values_for_header
@@ -173,7 +173,7 @@ def dataframe_to_Excel(
         dataframe_to_append.to_excel(writer, sheet_name=my_sheet)
 
 
-def get_extra_colors(parameters: ty.Dict) -> pd.DataFrame:
+def get_extra_colors(parameters: dict) -> pd.DataFrame:
     '''
     This function gets the user-defined extra colors from a file.
     This file contains the names of the colors, and their RGB values
@@ -182,7 +182,7 @@ def get_extra_colors(parameters: ty.Dict) -> pd.DataFrame:
     as values.
     '''
 
-    colors: ty.Dict[str, int] = parameters['colors']
+    colors: dict[str, int] = parameters['colors']
     extra_colors: pd.DataFrame = pd.DataFrame(columns=['R', 'G', 'B'])
     for color in colors:
         extra_colors.loc[color] = colors[color]
@@ -191,7 +191,7 @@ def get_extra_colors(parameters: ty.Dict) -> pd.DataFrame:
     return extra_colors
 
 
-def get_rgb_from_name(color_name: str, parameters: ty.Dict) -> ty.List[float]:
+def get_rgb_from_name(color_name: str, parameters: dict) -> list[float]:
     '''
     This function takes a color name and returns its RGB values (0 to 1).
     If the color name is in the extra colors, then, we use
@@ -207,19 +207,19 @@ def get_rgb_from_name(color_name: str, parameters: ty.Dict) -> ty.List[float]:
 
 
 def rgb_color_list(
-    color_names: ty.List[str], parameters: ty.Dict
-) -> ty.List[ty.List[float]]:
+    color_names: list[str], parameters: dict
+) -> list[list[float]]:
     '''
     Gets a list of RGB codes for a list of color names.
     '''
-    rgb_codes: ty.List[ty.List[float]] = [
+    rgb_codes: list[list[float]] = [
         get_rgb_from_name(color_name, parameters) for color_name in color_names
     ]
 
     return rgb_codes
 
 
-def register_color_bars(parameters: ty.Dict) -> None:
+def register_color_bars(parameters: dict) -> None:
     '''
     This function reads the user-defined color bars in a parameter file
     (names for the bars, and a list of the colors they contain, with the
@@ -228,10 +228,10 @@ def register_color_bars(parameters: ty.Dict) -> None:
     in the list of available color maps.
     '''
 
-    color_bars: ty.Dict[str, ty.List[str]] = parameters['color_bars']
+    color_bars: dict[str, list[str]] = parameters['color_bars']
 
     # This dictionary stores the dictionaries for each color bar
-    color_bar_dictionary: ty.Dict = {}
+    color_bar_dictionary: dict = {}
     # These colors are the three base keys of each bar color dictionary
     # Each dictionary contains a tuple of tuples for each base colors
     # Each of these sub-tuples cotains a step (between 0 and 1),
@@ -240,12 +240,12 @@ def register_color_bars(parameters: ty.Dict) -> None:
     # if cretaing discontinuities.
     # See https://matplotlib.org/stable/gallery/color/custom_cmap.html
     # for details
-    base_colors_for_color_bar: ty.List[str] = ['red', 'green', 'blue']
+    base_colors_for_color_bar: list[str] = ['red', 'green', 'blue']
 
     # We fill the color bar dictionary
     for color_bar in color_bars:
         # We read the color list
-        color_bar_colors: ty.List[str] = color_bars[color_bar]
+        color_bar_colors: list[str] = color_bars[color_bar]
         # We set the color steps, based on the color list
         color_steps: np.ndarray = np.linspace(0, 1, len(color_bar_colors))
 
@@ -312,8 +312,8 @@ def get_season(time_stamp: datetime.datetime) -> str:
     date: datetime.datetime = datetime.datetime(
         time_stamp.year, time_stamp.month, time_stamp.day, 0, 0
     )
-    seasons: ty.List[
-        ty.Tuple[str, ty.Tuple[datetime.datetime, datetime.datetime]]
+    seasons: list[
+        tuple[str, tuple[datetime.datetime, datetime.datetime]]
     ] = [
         (
             'winter',
@@ -361,7 +361,7 @@ def save_figure(
     figure: matplotlib.figure.Figure,
     figure_name: str,
     output_folder: str,
-    parameters: ty.Dict,
+    parameters: dict,
 ) -> None:
     '''
     This function saves a Matplolib figure to a number of
@@ -370,10 +370,10 @@ def save_figure(
     '''
 
     check_if_folder_exists(output_folder)
-    file_parameters: ty.Dict = parameters['files']
-    figure_parameters: ty.Dict = file_parameters['figures']
+    file_parameters: dict = parameters['files']
+    figure_parameters: dict = file_parameters['figures']
     dpi_to_use: int = figure_parameters['dpi']
-    outputs: ty.Dict[str, bool] = figure_parameters['outputs']
+    outputs: dict[str, bool] = figure_parameters['outputs']
 
     for file_type in outputs:
         if outputs[file_type]:
@@ -387,7 +387,7 @@ def save_dataframe(
     dataframe_name: str,
     groupfile_name: str,
     output_folder: str,
-    parameters: ty.Dict,
+    parameters: dict,
 ) -> None:
     '''
     This function saves a pandas dataframe to a number of
@@ -419,12 +419,12 @@ def save_dataframe(
     '''
 
     check_if_folder_exists(output_folder)
-    file_parameters: ty.Dict = parameters['files']
-    dataframe_outputs: ty.Dict[str, bool] = file_parameters[
+    file_parameters: dict = parameters['files']
+    dataframe_outputs: dict[str, bool] = file_parameters[
         'dataframe_outputs'
     ]
 
-    file_types: ty.List[str] = [
+    file_types: list[str] = [
         'csv',
         'json',
         'html',
@@ -447,7 +447,7 @@ def save_dataframe(
     # Note that clipboard does not produce a file,
     # but can still be used locally, so the function supports it.
 
-    file_extensions: ty.List[str] = [
+    file_extensions: list[str] = [
         'csv',
         'json',
         'html',
@@ -465,7 +465,7 @@ def save_dataframe(
 
     # This determines if the dataframe is saved into its own file
     # or into a group file (such as a database or an Excel Workbook)
-    is_groupfile_per_type: ty.List[bool] = [
+    is_groupfile_per_type: list[bool] = [
         False,
         False,
         False,
@@ -481,7 +481,7 @@ def save_dataframe(
         True,
     ]
 
-    file_functions: ty.List[ty.Callable] = []
+    file_functions: list[ty.Callable] = []
     for file_type, is_groupfile in zip(file_types, is_groupfile_per_type):
 
         # Some file formats require some extra processing, so
@@ -549,7 +549,7 @@ def save_dataframe(
         else:
             file_functions.append(getattr(dataframe_to_use, function_name))
 
-    using_file_types: ty.List[bool] = [
+    using_file_types: list[bool] = [
         dataframe_outputs[file_type] for file_type in file_types
     ]
 
@@ -657,25 +657,25 @@ def put_dataframe_in_sql_in_chunks(
             table_action = 'append'
 
 
-def query_list_from_file(sql_file: str) -> ty.List[str]:
+def query_list_from_file(sql_file: str) -> list[str]:
     '''
     This returns a list of queries from an SQL file
     '''
 
     with open(sql_file) as script_file:
-        sql_queries: ty.List[str] = script_file.read().split(';')
+        sql_queries: list[str] = script_file.read().split(';')
 
     sql_queries.remove('')
     return sql_queries
 
 
 def dataframes_from_query_list(
-    query_list: ty.List[str], sql_connection: sqlite3.Connection
-) -> ty.List[pd.DataFrame]:
+    query_list: list[str], sql_connection: sqlite3.Connection
+) -> list[pd.DataFrame]:
     '''
     This returns a list of dataframes, each obtained from a query in the list
     '''
-    dataframe_list: ty.List[pd.DataFrame] = [
+    dataframe_list: list[pd.DataFrame] = [
         pd.read_sql(sql_query, sql_connection) for sql_query in query_list
     ]
 
@@ -702,9 +702,9 @@ def from_grib_to_dataframe(grib_file: str) -> pd.DataFrame:
 def read_query_generator(
     quantities_to_display: str,
     source_table: str,
-    query_filter_quantities: ty.List[str] = [''],
-    query_filter_types: ty.List[str] = [''],
-    query_filter_values: ty.List = [''],
+    query_filter_quantities: list[str] = [''],
+    query_filter_types: list[str] = [''],
+    query_filter_values: list = [''],
     # This can be a List of strings, or a nested list (see explanations)
 ) -> str:
     '''
@@ -769,7 +769,7 @@ def read_query_generator(
     return output_query
 
 
-def database_tables_columns(database: str) -> ty.Dict:
+def database_tables_columns(database: str) -> dict:
     '''
     Returns a dictionary with the tables of a database as keys and their
     columns as values.
@@ -778,8 +778,8 @@ def database_tables_columns(database: str) -> ty.Dict:
     tables_query: str = 'select name from sqlite_master where type="table";'
     database_cursor: sqlite3.Cursor = database_connection.cursor()
     database_cursor.execute(tables_query)
-    database_tables: ty.List[str] = database_cursor.fetchall()
-    tables_columns: ty.Dict[str, ty.Any] = {}
+    database_tables: list[str] = database_cursor.fetchall()
+    tables_columns: dict[str, ty.Any] = {}
     for table in database_tables:
         table_name: str = table[0]
         # table_name = f'"{table[0]}"'
@@ -824,14 +824,14 @@ def string_to_float(my_string: str) -> float:
     return my_output
 
 
-def get_map_area_data(parameters: ty.Dict) -> gpd.GeoDataFrame:
+def get_map_area_data(parameters: dict) -> gpd.GeoDataFrame:
     '''
     This function gets and processes the area data and sets it
     into a DataFrame. It contains polygons/multipolygons
     (they are at a given granularity level, but also have references to higher
     levels).
     '''
-    maps_parameters: ty.Dict[str, ty.Any] = parameters['maps']
+    maps_parameters: dict[str, ty.Any] = parameters['maps']
     map_data_folder: str = maps_parameters['map_data_folder']
     # This file contains data at NUTS level 3. The reason for this is so that
     # we can remove the outer regions (such as Svalbard or French overseas
@@ -845,7 +845,7 @@ def get_map_area_data(parameters: ty.Dict) -> gpd.GeoDataFrame:
     # This is the list of regions to remove from the map.
     # These are the outer regions (such as Svalbard or French overseas
     # territories).
-    general_exclusion_codes: ty.List[str] = maps_parameters[
+    general_exclusion_codes: list[str] = maps_parameters[
         'general_exclusion_codes'
     ]
 
@@ -856,12 +856,12 @@ def get_map_area_data(parameters: ty.Dict) -> gpd.GeoDataFrame:
     return area_data
 
 
-def get_map_borders(NUTS_level: int, parameters: ty.Dict) -> gpd.GeoDataFrame:
+def get_map_borders(NUTS_level: int, parameters: dict) -> gpd.GeoDataFrame:
     '''
     This function gets the borders/contours of regions at a specified NUTS
     level.
     '''
-    maps_parameters: ty.Dict[str, ty.Any] = parameters['maps']
+    maps_parameters: dict[str, ty.Any] = parameters['maps']
     map_data_folder: str = maps_parameters['map_data_folder']
     border_data_file_prefix: str = maps_parameters['border_data_file_prefix']
     border_data_file_suffix: str = maps_parameters['border_data_file_suffix']
@@ -877,12 +877,12 @@ def get_map_borders(NUTS_level: int, parameters: ty.Dict) -> gpd.GeoDataFrame:
     return border_data
 
 
-def get_map_points(NUTS_level: int, parameters: ty.Dict) -> gpd.GeoDataFrame:
+def get_map_points(NUTS_level: int, parameters: dict) -> gpd.GeoDataFrame:
     '''
     This function gets the points/labels of regions at a specified NUTS
     level.
     '''
-    maps_parameters: ty.Dict[str, ty.Any] = parameters['maps']
+    maps_parameters: dict[str, ty.Any] = parameters['maps']
     map_data_folder: str = maps_parameters['map_data_folder']
     points_data_file_prefix: str = maps_parameters['points_data_file_prefix']
     points_data_file_suffix: str = maps_parameters['points_data_file_suffix']
@@ -901,10 +901,10 @@ def get_map_points(NUTS_level: int, parameters: ty.Dict) -> gpd.GeoDataFrame:
 def make_spider_chart(
     spider_plot: matplotlib.projections.polar.PolarAxes,
     series_label: str,
-    data_labels: ty.List[str],
-    data_values: ty.List[float],
-    ticks: ty.List[float],
-    tick_labels: ty.List[str],
+    data_labels: list[str],
+    data_values: list[float],
+    ticks: list[float],
+    tick_labels: list[str],
     spider_color: str,
     spider_marker: str,
     spider_linewidth: float,
@@ -914,7 +914,7 @@ def make_spider_chart(
     This function draws a spider/radar chart on a plot (Axes) for a given
     series of data (with values, labels, and formats).
     '''
-    angles: ty.List[float] = list(
+    angles: list[float] = list(
         np.linspace(0, 2 * np.pi, len(data_labels), endpoint=False)
     )
 
@@ -923,7 +923,7 @@ def make_spider_chart(
     # contour.
     angles_for_contour: np.ndarray = np.concatenate((angles, [angles[0]]))
     # data_labels_for_contour = np.concatenate((data_labels, [data_labels[0]]))
-    data_values_for_contour: ty.List[float] = list(
+    data_values_for_contour: list[float] = list(
         np.concatenate((data_values, [data_values[0]]))
     )
 
@@ -952,11 +952,11 @@ def make_spider_chart(
 def update_database_table(
     database_to_update: str,
     table_to_update: str,
-    columns_to_update: ty.List[str],
-    new_values: ty.List[ty.Any],
-    query_filter_quantities: ty.List[str],
-    query_filter_types: ty.List[str],
-    query_filter_values: ty.List[str],
+    columns_to_update: list[str],
+    new_values: list[ty.Any],
+    query_filter_quantities: list[str],
+    query_filter_types: list[str],
+    query_filter_values: list[str],
 ) -> None:
     '''
     This function updates the values
@@ -1027,9 +1027,9 @@ def update_database_table(
 
 
 def make_query_filter(
-    query_filter_quantities: ty.List[str],
-    query_filter_types: ty.List[str],
-    query_filter_values: ty.List[str],
+    query_filter_quantities: list[str],
+    query_filter_types: list[str],
+    query_filter_values: list[str],
 ) -> str:
     '''
     Returns a query filter stringthat can be used in an SQL query.
@@ -1131,7 +1131,7 @@ def read_table_from_database(
 def put_dataframe_in_word_document(
     dataframe_to_put: pd.DataFrame,
     word_document_name: str,
-    number_formats: ty.List[str] = ['.2f'],
+    number_formats: list[str] = ['.2f'],
     table_style: str = 'Normal Table',
     empty_code: str = '',
     cell_font_size: int = 11,
@@ -1180,7 +1180,7 @@ def put_dataframe_in_word_document(
         if len(number_formats) > 1:
             print('You have provided several number formats.')
             print('But less than the amounts of columns.')
-            print('We have used the first of your numver formats.')
+            print('We have used the first of your number formats.')
             print('Please correct your entry')
 
     # Weput a space before the table
@@ -1354,16 +1354,16 @@ def clear_word_document(document_file_name: str) -> None:
     target_document.save(document_file_name)
 
 
-def get_rgb_255_code_string(color_name: str, parameters: ty.Dict) -> str:
+def get_rgb_255_code_string(color_name: str, parameters: dict) -> str:
     '''
     Creates a string with rgb values (0-255),
     rgb(111, 233, 66)
     This is used for plotly.
     '''
     # We convert the color name to an RGB (0-255)
-    rgb_255: ty.List[float] = 255 * get_rgb_from_name(color_name, parameters)
+    rgb_255: list[float] = 255 * get_rgb_from_name(color_name, parameters)
     # We make it a string (and remove the 0 decimal via int conversion)
-    rgb_255_list: ty.List[str] = list(map(str, map(int, rgb_255)))
+    rgb_255_list: list[str] = list(map(str, map(int, rgb_255)))
     rgb_255_code_string: str = f'({", ".join(rgb_255_list)})'
 
     return rgb_255_code_string
@@ -1375,14 +1375,14 @@ def make_quantity_map(
     map_areas: pd.DataFrame,
     quantity_plot: matplotlib.axes.Axes,
     quantity_color: str,
-    map_grid_plot_parameters: ty.Dict,
-    parameters: ty.Dict,
+    map_grid_plot_parameters: dict,
+    parameters: dict,
 ) -> None:
     '''
     Makes one of the quantity maps in a map grid.
     '''
     # We get some display parameters
-    no_data_color: ty.List[float] = get_rgb_from_name(
+    no_data_color: list[float] = get_rgb_from_name(
         map_grid_plot_parameters['no_data_color'], parameters
     )
     heat_bar_map: str = quantity_color
@@ -1390,8 +1390,8 @@ def make_quantity_map(
     plot_title_font_size: int = map_grid_plot_parameters[
         'plot_title_font_size'
     ]
-    map_x_range: ty.List[float] = map_grid_plot_parameters['map_x_range']
-    map_y_range: ty.List[float] = map_grid_plot_parameters['map_y_range']
+    map_x_range: list[float] = map_grid_plot_parameters['map_x_range']
+    map_y_range: list[float] = map_grid_plot_parameters['map_y_range']
 
     # We create a range for the values to display (for the
     # scale of the legend bar).
@@ -1400,7 +1400,7 @@ def make_quantity_map(
     lowest_value_to_plot: float = values_to_plot.min()
     highest_value_to_plot: float = values_to_plot.max()
 
-    display_reference_scale: ty.List[float] = reference_scale(
+    display_reference_scale: list[float] = reference_scale(
         [lowest_value_to_plot, highest_value_to_plot], 1
     )
     lowest_value_to_display: float = display_reference_scale[0]
@@ -1438,10 +1438,10 @@ def make_quantity_map(
 
 
 def map_grid(
-    quantities_data: ty.List[pd.DataFrame],
-    quantity_display_names: ty.List[str],
-    quantity_colors: ty.List[str],
-    parameters: ty.Dict,
+    quantities_data: list[pd.DataFrame],
+    quantity_display_names: list[str],
+    quantity_colors: list[str],
+    parameters: dict,
 ) -> None:
     '''
     This function creates a grid of maps. You need to give it the data you want
@@ -1457,13 +1457,13 @@ def map_grid(
     '''
 
     # We read some parameters
-    file_parameters: ty.Dict = parameters['files']
+    file_parameters: dict = parameters['files']
     output_folder: str = file_parameters['output_folder']
 
-    map_grid_plot_parameters: ty.Dict = parameters['map_grid_plot']
+    map_grid_plot_parameters: dict = parameters['map_grid_plot']
     isoA3_file: str = map_grid_plot_parameters['isoA3_file']
     isoA3_codes: pd.DataFrame = pd.read_csv(f'{isoA3_file}')
-    isoA3_dict: ty.Dict[str, str] = dict(
+    isoA3_dict: dict[str, str] = dict(
         zip(isoA3_codes['Country'], isoA3_codes['IsoA3'])
     )
     iso_A3_header: str = map_grid_plot_parameters['iso_A3_header']
@@ -1481,7 +1481,7 @@ def map_grid(
 
     # We register the color bars (one per quantity color)
 
-    color_bars: ty.Dict = parameters['color_bars']
+    color_bars: dict = parameters['color_bars']
     for quantity_color in quantity_colors:
         color_bars[quantity_color] = [zero_color, quantity_color]
     register_color_bars(parameters)
@@ -1545,10 +1545,10 @@ def map_grid(
 def put_plots_on_map(
     map_figure: matplotlib.figure.Figure,
     map_data: pd.DataFrame,
-    map_parameters: ty.Dict,
+    map_parameters: dict,
     plot_y_total_values: pd.DataFrame,
     projection_type: ty.Optional[str] = None,
-) -> ty.Dict[str, matplotlib.axes.Axes]:
+) -> dict[str, matplotlib.axes.Axes]:
     '''
     Puts plots/axes on a map figure. You can then draw in these.
     The plot_y_total_values are the sizes of the plots per country (for example
@@ -1568,7 +1568,7 @@ def put_plots_on_map(
     map_data['latitude'] = map_data[location_latitudes_header].values
     map_data['longitude'] = map_data[location_longitudes_header].values
 
-    scaling_parameters: ty.Dict = map_parameters['scaling_parameters']
+    scaling_parameters: dict = map_parameters['scaling_parameters']
     # These parameters determine the size and location parameters to place
     # the plots and the necessary scaling factors. These should be adapted
     # if the plots don't come at the right place (they can change
@@ -1596,7 +1596,7 @@ def put_plots_on_map(
 
     # We create a dictionary that contains a plot/axis on top for each
     # location
-    plots_on_top: ty.Dict[str, matplotlib.axes.Axes] = {}
+    plots_on_top: dict[str, matplotlib.axes.Axes] = {}
 
     # We iterate through the locations
     for location in map_data.index:
@@ -1609,7 +1609,7 @@ def put_plots_on_map(
                 plot_y_total_values.loc[location] * y_size_scale / y_size_max
             )
             # We create the plot/Axes with the right size and scaling factors
-            plot_rectangle: ty.Tuple[float, float, float, float] = (
+            plot_rectangle: tuple[float, float, float, float] = (
                 x_start
                 * (1 + longitude_scaling * longitude / maximum_longitude),
                 y_start * (1 + latitude_scaling * latitude / maximum_latitude),
@@ -1624,7 +1624,7 @@ def put_plots_on_map(
 
 
 def rgba_code_color(
-    color_rgb: ty.Tuple[int, ...], color_opacity: float
+    color_rgb: tuple[int, ...], color_opacity: float
 ) -> str:
     '''
     Gets an RGBA string from a color RGB tuple.
@@ -1646,24 +1646,24 @@ def make_sankey(
     links: pd.DataFrame,
     sankey_title: str,
     output_folder: str,
-    parameters: ty.Dict,
+    parameters: dict,
 ) -> None:
     '''
     Makes a Sankey plot in plotly (comes out as an html file).
     The nodes and links are in a DataFrame
     '''
 
-    node_parameters: ty.Dict = parameters['Sankey']['nodes']
+    node_parameters: dict = parameters['Sankey']['nodes']
 
     label_padding: int = node_parameters['label_padding']
     label_alignement: str = node_parameters['label_alignement']
 
-    node_labels_names_only: ty.List[str] = pd.Series(nodes['Label']).to_list()
+    node_labels_names_only: list[str] = pd.Series(nodes['Label']).to_list()
     display_values: bool = node_parameters['display_values']
     if display_values:
         values_to_add: pd.Series[float] = nodes['Value']
         unit: str = node_parameters['unit']
-        node_labels: ty.List[str] = []
+        node_labels: list[str] = []
         for node_label, value_to_add in zip(
             node_labels_names_only, values_to_add
         ):
@@ -1674,42 +1674,42 @@ def make_sankey(
     node_x_positions: pd.Series[float] = nodes['X position']
     node_y_positions: pd.Series[float] = nodes['Y position']
     node_colors: pd.Series[str] = nodes['Color']
-    node_color_dict: ty.Dict[str, str] = dict(
+    node_color_dict: dict[str, str] = dict(
         zip(node_labels_names_only, node_colors)
     )
-    color_names: ty.Dict[str, ty.List[int]] = parameters['colors']
+    color_names: dict[str, list[int]] = parameters['colors']
 
-    node_colors_rgba_codes: ty.List[str] = []
+    node_colors_rgba_codes: list[str] = []
     for node_color in node_colors:
         color_opacity: float = 1
-        color_rgb: ty.Tuple[int, ...] = tuple(color_names[node_color])
+        color_rgb: tuple[int, ...] = tuple(color_names[node_color])
         node_colors_rgba_codes.append(
             rgba_code_color(color_rgb, color_opacity)
         )
 
-    link_parameters: ty.Dict[str, ty.Any] = parameters['Sankey']['links']
+    link_parameters: dict[str, ty.Any] = parameters['Sankey']['links']
 
     link_sources: pd.Series = links['Source']
-    link_source_indices: ty.List[int] = [
+    link_source_indices: list[int] = [
         node_labels_names_only[node_labels_names_only == source].index[0]
         for source in link_sources
     ]
 
     link_targets: pd.Series = links['Target']
-    link_target_indices: ty.List[int] = [
+    link_target_indices: list[int] = [
         node_labels_names_only[node_labels_names_only == target].index[0]
         for target in link_targets
     ]
     value_scaling_factor: float = link_parameters['value_scaling_factor']
     link_values_unscaled: pd.Series = links['Value']
-    link_values: ty.List[float] = [
+    link_values: list[float] = [
         link_value / value_scaling_factor
         for link_value in link_values_unscaled
     ]
     link_colors: pd.Series[str] = links['Color']
     link_opacities: pd.Series[float] = links['Opacity']
     link_labels: pd.Series[str] = links['Label']
-    link_colors_rgba_codes: ty.List[str] = []
+    link_colors_rgba_codes: list[str] = []
     for link_color, link_opacity, source, target, link_label in zip(
         link_colors,
         link_opacities,
@@ -1758,7 +1758,7 @@ def make_sankey(
     sankey_figure.write_html(f'{output_folder}/{sankey_title}.html')
 
 
-def get_nested_value(dictionary: ty.Dict, key_list: ty.List[str]) -> ty.Any:
+def get_nested_value(dictionary: dict, key_list: list[str]) -> ty.Any:
     '''
     If you give a dictionary (for example a TOML configuration file)
     and a list of nested keys, this returns the desired value.
@@ -1772,7 +1772,7 @@ def get_nested_value(dictionary: ty.Dict, key_list: ty.List[str]) -> ty.Any:
 
 
 def set_nested_value(
-    dictionary: ty.Dict, key_list: ty.List[str], value_to_set: ty.Any
+    dictionary: dict, key_list: list[str], value_to_set: ty.Any
 ) -> None:
     '''
     This sets the value of a nested element of a dictionary (for example
