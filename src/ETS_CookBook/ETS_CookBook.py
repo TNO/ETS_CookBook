@@ -312,9 +312,7 @@ def get_season(time_stamp: datetime.datetime) -> str:
     date: datetime.datetime = datetime.datetime(
         time_stamp.year, time_stamp.month, time_stamp.day, 0, 0
     )
-    seasons: list[
-        tuple[str, tuple[datetime.datetime, datetime.datetime]]
-    ] = [
+    seasons: list[tuple[str, tuple[datetime.datetime, datetime.datetime]]] = [
         (
             'winter',
             (
@@ -420,9 +418,7 @@ def save_dataframe(
 
     check_if_folder_exists(output_folder)
     file_parameters: dict = parameters['files']
-    dataframe_outputs: dict[str, bool] = file_parameters[
-        'dataframe_outputs'
-    ]
+    dataframe_outputs: dict[str, bool] = file_parameters['dataframe_outputs']
 
     file_types: list[str] = [
         'csv',
@@ -1623,9 +1619,7 @@ def put_plots_on_map(
     return plots_on_top
 
 
-def rgba_code_color(
-    color_rgb: tuple[int, ...], color_opacity: float
-) -> str:
+def rgba_code_color(color_rgb: tuple[int, ...], color_opacity: float) -> str:
     '''
     Gets an RGBA string from a color RGB tuple.
     This is useful for plotly.
