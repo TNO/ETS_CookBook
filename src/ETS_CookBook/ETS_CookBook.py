@@ -1356,10 +1356,13 @@ def get_rgb_255_code_string(color_name: str, parameters: dict) -> str:
     rgb(111, 233, 66)
     This is used for plotly.
     '''
-    # We convert the color name to an RGB (0-255)
-    rgb_255: list[float] = 255 * get_rgb_from_name(color_name, parameters)
-    # We make it a string (and remove the 0 decimal via int conversion)
-    rgb_255_list: list[str] = list(map(str, map(int, rgb_255)))
+    # We get the RGB (0-1) from the color name
+    rgb_1: list[float] = get_rgb_from_name(color_name, parameters)
+    # We convert this to a 0-255 rgb list
+    rgb_255: list[int] = [int(255 * rgb_value) for rgb_value in rgb_1]
+
+    # We make it a string (
+    rgb_255_list: list[str] = list(map(str, rgb_255))
     rgb_255_code_string: str = f'({", ".join(rgb_255_list)})'
 
     return rgb_255_code_string
