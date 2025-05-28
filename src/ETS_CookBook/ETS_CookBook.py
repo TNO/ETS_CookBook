@@ -1363,7 +1363,7 @@ def get_rgb_255_code_string(color_name: str, parameters: dict) -> str:
 
     # We make it a string (
     rgb_255_list: list[str] = list(map(str, rgb_255))
-    rgb_255_code_string: str = f'({", ".join(rgb_255_list)})'
+    rgb_255_code_string: str = f'rgb({", ".join(rgb_255_list)})'
 
     return rgb_255_code_string
 
