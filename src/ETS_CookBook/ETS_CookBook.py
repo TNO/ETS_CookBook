@@ -1379,15 +1379,15 @@ def get_rgba_255_code_string(
     # We get the RGB (0-1) from the color name
     rgb_1: list[float] = get_rgb_from_name(color_name, parameters)
     # We convert this to a 0-255 rgb list
-    rgb_255: list[int] = [int(255 * rgb_value) for rgb_value in rgb_1]
+    rgba_255: list[int | float] = [int(255 * rgb_value) for rgb_value in rgb_1]
     # We add the opacity:
-    rgba_codes: list[int | float] = rgb_255.append(opacity)
+    rgba_255.append(opacity)
 
     # We make it a string (
-    rgba_string_list: list[str] = list(map(str, rgba_codes))
+    rgba_string_list: list[str] = list(map(str, rgba_255))
     rgba_code_string: str = f'rgba({", ".join(rgba_string_list)})'
 
-    return rgba_string_list
+    return rgba_code_string
 
 
 def make_quantity_map(
