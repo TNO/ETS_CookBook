@@ -1368,6 +1368,28 @@ def get_rgb_255_code_string(color_name: str, parameters: dict) -> str:
     return rgb_255_code_string
 
 
+def get_rgba_255_code_string(
+    color_name: str, opacity: float, parameters: dict
+) -> str:
+    '''
+    Creates a string with rgba values (0-255),
+    rgb(111, 233, 66, 1)
+    This is used for plotly.
+    '''
+    # We get the RGB (0-1) from the color name
+    rgb_1: list[float] = get_rgb_from_name(color_name, parameters)
+    # We convert this to a 0-255 rgb list
+    rgb_255: list[int] = [int(255 * rgb_value) for rgb_value in rgb_1]
+    # We add the opacity:
+    rgba_codes: list[int | float] = rgb_255.append(opacity)
+
+    # We make it a string (
+    rgba_string_list: list[str] = list(map(str, rgba_codes))
+    rgba_code_string: str = f'rgba({", ".join(rgba_string_list)})'
+
+    return rgba_string_list
+
+
 def make_quantity_map(
     quantity_display_name: str,
     plot_data: pd.DataFrame,
