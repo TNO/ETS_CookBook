@@ -846,15 +846,16 @@ def get_map_area_data(map_parameters: box.Box) -> gpd.GeoDataFrame:
     return area_data
 
 
-def get_map_borders(NUTS_level: int, parameters: dict) -> gpd.GeoDataFrame:
+def get_map_borders(
+    NUTS_level: int, map_parameters: box.Box
+) -> gpd.GeoDataFrame:
     '''
     This function gets the borders/contours of regions at a specified NUTS
     level.
     '''
-    maps_parameters: dict[str, ty.Any] = parameters['maps']
-    map_data_folder: str = maps_parameters['map_data_folder']
-    border_data_file_prefix: str = maps_parameters['border_data_file_prefix']
-    border_data_file_suffix: str = maps_parameters['border_data_file_suffix']
+    map_data_folder: str = map_parameters.map_data_folder
+    border_data_file_prefix: str = map_parameters.border_data_file_prefix
+    border_data_file_suffix: str = map_parameters.border_data_file_suffix
 
     border_data_file: str = (
         f'{border_data_file_prefix}{NUTS_level}{border_data_file_suffix}'
