@@ -11,6 +11,7 @@ import math
 import os
 import sqlite3
 import time
+import tomllib
 import typing as ty
 import zipfile
 
@@ -33,11 +34,6 @@ import pandas as pd
 import plotly.graph_objects as go
 import requests
 import xarray as xr
-
-try:
-    import tomllib
-except ModuleNotFoundError:
-    import tomli as tomllib
 
 
 def check_if_folder_exists(folder_to_check: str) -> None:
@@ -1464,7 +1460,7 @@ def map_grid(
     color_bar_definitions: box.Box,
     color_definitions: box.Box,
     dpi_to_use: int,
-    file_formats: box.Box
+    file_formats: box.Box,
 ) -> None:
     '''
     This function creates a grid of maps. You need to give it the data you want
