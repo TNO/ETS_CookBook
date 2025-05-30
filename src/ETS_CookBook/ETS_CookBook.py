@@ -1394,23 +1394,22 @@ def make_quantity_map(
     map_areas: pd.DataFrame,
     quantity_plot: matplotlib.axes.Axes,
     quantity_color: str,
-    map_grid_plot_parameters: dict,
-    parameters: dict,
+    map_grid_plot_parameters: box.Box,
+    color_definitions: box.Box
 ) -> None:
     '''
     Makes one of the quantity maps in a map grid.
     '''
     # We get some display parameters
     no_data_color: list[float] = get_rgb_from_name(
-        map_grid_plot_parameters['no_data_color'], parameters
+        map_grid_plot_parameters.no_data_color, color_definitions
     )
     heat_bar_map: str = quantity_color
-    values_column = map_grid_plot_parameters['values_column']
-    plot_title_font_size: int = map_grid_plot_parameters[
-        'plot_title_font_size'
-    ]
-    map_x_range: list[float] = map_grid_plot_parameters['map_x_range']
-    map_y_range: list[float] = map_grid_plot_parameters['map_y_range']
+    values_column = map_grid_plot_parameters.values_column
+    plot_title_font_size: int = map_grid_plot_parameters.plot_title_font_size
+    
+    map_x_range: list[float] = map_grid_plot_parameters.map_x_range
+    map_y_range: list[float] = map_grid_plot_parameters.map_y_range
 
     # We create a range for the values to display (for the
     # scale of the legend bar).
