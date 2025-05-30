@@ -1395,7 +1395,7 @@ def make_quantity_map(
     quantity_plot: matplotlib.axes.Axes,
     quantity_color: str,
     map_grid_plot_parameters: box.Box,
-    color_definitions: box.Box
+    color_definitions: box.Box,
 ) -> None:
     '''
     Makes one of the quantity maps in a map grid.
@@ -1407,7 +1407,7 @@ def make_quantity_map(
     heat_bar_map: str = quantity_color
     values_column = map_grid_plot_parameters.values_column
     plot_title_font_size: int = map_grid_plot_parameters.plot_title_font_size
-    
+
     map_x_range: list[float] = map_grid_plot_parameters.map_x_range
     map_y_range: list[float] = map_grid_plot_parameters.map_y_range
 
@@ -1459,7 +1459,12 @@ def map_grid(
     quantities_data: list[pd.DataFrame],
     quantity_display_names: list[str],
     quantity_colors: list[str],
-    parameters: dict,
+    output_folder: str,
+    map_grid_plot_parameters: box.Box,
+    color_bar_definitions: box.Box,
+    color_definitions: box.Box,
+    dpi_to_use: int,
+    file_formats: box.Box
 ) -> None:
     '''
     This function creates a grid of maps. You need to give it the data you want
@@ -1475,34 +1480,30 @@ def map_grid(
     '''
 
     # We read some parameters
-    file_parameters: dict = parameters['files']
-    output_folder: str = file_parameters['output_folder']
 
-    map_grid_plot_parameters: dict = parameters['map_grid_plot']
-    isoA3_file: str = map_grid_plot_parameters['isoA3_file']
+    isoA3_file: str = map_grid_plot_parameters.isoA3_file
     isoA3_codes: pd.DataFrame = pd.read_csv(f'{isoA3_file}')
     isoA3_dict: dict[str, str] = dict(
-        zip(isoA3_codes['Country'], isoA3_codes['IsoA3'])
+        zip(isoA3_codes.Country, isoA3_codes.IsoA3)
     )
-    iso_A3_header: str = map_grid_plot_parameters['iso_A3_header']
-    iso_A3_header_in_map_data: str = map_grid_plot_parameters[
-        'iso_A3_header_in_map_data'
-    ]
+    iso_A3_header: str = map_grid_plot_parameters.iso_A3_header
+    iso_A3_header_in_map_data: str = (
+        map_grid_plot_parameters.iso_A3_header_in_map_data
+    )
 
-    figure_title: str = map_grid_plot_parameters['figure_title']
+    figure_title: str = map_grid_plot_parameters.figure_title
 
-    number_of_rows: int = map_grid_plot_parameters['rows']
-    number_of_columns: int = map_grid_plot_parameters['columns']
-    map_data_folder: str = map_grid_plot_parameters['map_data_folder']
-    map_data_file: str = map_grid_plot_parameters['map_data_file']
-    zero_color: str = map_grid_plot_parameters['zero_color']
+    number_of_rows: int = map_grid_plot_parameters.rows
+    number_of_columns: int = map_grid_plot_parameters.columns
+    map_data_folder: str = map_grid_plot_parameters.map_data_folder
+    map_data_file: str = map_grid_plot_parameters.map_data_file
+    zero_color: str = map_grid_plot_parameters.zero_color
 
-    # We register the color bars (one per quantity color)
-
-    color_bars: dict = parameters['color_bars']
+    # We register the color bars (one per quantity color) in addition to ones
+    # already existing
     for quantity_color in quantity_colors:
-        color_bars[quantity_color] = [zero_color, quantity_color]
-    register_color_bars(parameters)
+        color_bar_definitions[quantity_color] = [zero_color, quantity_color]
+    register_color_bars(color_bar_definitions, color_definitions)
 
     # We read the map data from a file
     map_areas: gpd.GeoDataFrame = gpd.read_file(
@@ -1551,13 +1552,15 @@ def map_grid(
             quantity_plot,
             quantity_color,
             map_grid_plot_parameters,
-            parameters,
+            color_definitions,
         )
     # We put a suptitle and save the figure
     grid_figure.suptitle(f'{figure_title}')
     grid_figure.tight_layout()
 
-    save_figure(grid_figure, f'{figure_title}', output_folder, parameters)
+    save_figure(
+        grid_figure, f'{figure_title}', output_folder, dpi_to_use, file_formats
+    )
 
 
 def put_plots_on_map(
