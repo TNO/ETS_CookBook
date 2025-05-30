@@ -223,16 +223,16 @@ def rgb_color_list(
     return rgb_codes
 
 
-def register_color_bars(parameters: dict) -> None:
+def register_color_bars(
+    color_bar_definitions: box.Box, color_definitions: box.Box
+) -> None:
     '''
-    This function reads the user-defined color bars in a parameter file
+    This function reads the user-defined color bars in Box
     (names for the bars, and a list of the colors they contain, with the
     first being at the bottom of the bar, and the last at the top, and the
     others in between). It then creates the color bars and stores them
     in the list of available color maps.
     '''
-
-    color_bars: dict[str, list[str]] = parameters['color_bars']
 
     # This dictionary stores the dictionaries for each color bar
     color_bar_dictionary: dict = {}
@@ -247,9 +247,9 @@ def register_color_bars(parameters: dict) -> None:
     base_colors_for_color_bar: list[str] = ['red', 'green', 'blue']
 
     # We fill the color bar dictionary
-    for color_bar in color_bars:
+    for color_bar in color_bar_definitions:
         # We read the color list
-        color_bar_colors: list[str] = color_bars[color_bar]
+        color_bar_colors: list[str] = color_bar_definitions[color_bar]
         # We set the color steps, based on the color list
         color_steps: np.ndarray = np.linspace(0, 1, len(color_bar_colors))
 
@@ -267,7 +267,7 @@ def register_color_bars(parameters: dict) -> None:
                 # We get the tone by getting the RGB values of the
                 # color bar color and taking the corresponding base index
                 color_bar_color_tone = get_rgb_from_name(
-                    color_bar_color, parameters
+                    color_bar_color, color_definitions
                 )[base_color_index]
 
                 base_color_entries.append(
@@ -294,7 +294,7 @@ def register_color_bars(parameters: dict) -> None:
 
     # We now add the color bars to the color maps
 
-    for color_bar in color_bars:
+    for color_bar in color_bar_definitions:
         color_bar_to_register: matplotlib.colors.LinearSegmentedColormap = (
             matplotlib.colors.LinearSegmentedColormap(
                 color_bar, color_bar_dictionary[color_bar]
@@ -1834,7 +1834,8 @@ if __name__ == '__main__':
     extra_colors: pd.DataFrame = get_extra_colors(
         color_definitions=color_definitions
     )
-    print(extra_colors)
+    color_bar_definitions: box.Box = parameters.color_bars
+    register_color_bars(color_bar_definitions, color_definitions)
     # dataframe_from_Excel_table_name('Test_Table', 'Standard_Excel.xlsm')
     # check if WB and table exist. If not, return empty DF (with error message
     #  (in it?))
