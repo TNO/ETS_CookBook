@@ -55,8 +55,7 @@ def check_if_folder_exists(folder_to_check: str) -> None:
 
 def parameters_from_TOML(parameters_file_name: str) -> box.Box:
     '''
-    Reads a TOML parameters file name and returns a parameters Box
-    dictionary.
+    Reads a TOML parameters file name and returns a parameters Box.
     '''
 
     with open(parameters_file_name, mode='rb') as parameters_file:
@@ -174,19 +173,20 @@ def dataframe_to_Excel(
         dataframe_to_append.to_excel(writer, sheet_name=my_sheet)
 
 
-def get_extra_colors(parameters: dict) -> pd.DataFrame:
+def get_extra_colors(color_definitions: box.Box) -> pd.DataFrame:
     '''
-    This function gets the user-defined extra colors from a file.
-    This file contains the names of the colors, and their RGB values
+    This function gets user-defined extra colors from a Box..
+    This Box contains the names of the colors, and their RGB values
     (from 0 to 255). The function returns a DataFrame with
     color names as index, and their RGB codes (between 0 and 1)
     as values.
     '''
 
-    colors: dict[str, int] = parameters['colors']
     extra_colors: pd.DataFrame = pd.DataFrame(columns=['R', 'G', 'B'])
-    for color in colors:
-        extra_colors.loc[color] = colors[color]
+    for color_definition in color_definitions:
+        extra_colors.loc[color_definition] = color_definitions[
+            color_definition
+        ]
     extra_colors = extra_colors / 255
 
     return extra_colors
@@ -1826,7 +1826,12 @@ def function_timer(function_to_time: ty.Callable) -> ty.Callable:
 if __name__ == '__main__':
 
     parameters_file_name = 'test.toml'
-    parameters = parameters_from_TOML(parameters_file_name)
+    parameters: box.Box = parameters_from_TOML(parameters_file_name)
+    color_definitions: box.Box = parameters.colors
+    extra_colors: pd.DataFrame = get_extra_colors(
+        color_definitions=color_definitions
+    )
+    print(extra_colors)
     # dataframe_from_Excel_table_name('Test_Table', 'Standard_Excel.xlsm')
     # check if WB and table exist. If not, return empty DF (with error message
     #  (in it?))
