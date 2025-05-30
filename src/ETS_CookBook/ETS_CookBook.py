@@ -5,6 +5,7 @@ They are listed in the following documentation:
 https://tno.github.io/ETS_CookBook/
 '''
 
+import collections
 import datetime
 import functools
 import math
@@ -16,6 +17,7 @@ import typing as ty
 import zipfile
 
 import box
+import dash
 import docx
 import docx.document
 import geopandas as gpd
@@ -31,6 +33,7 @@ import openpyxl.worksheet
 import openpyxl.worksheet.cell_range
 import openpyxl.worksheet.table
 import pandas as pd
+import plotly
 import plotly.graph_objects as go
 import requests
 import xarray as xr
@@ -1816,6 +1819,170 @@ def function_timer(function_to_time: ty.Callable) -> ty.Callable:
         return function_result
 
     return time_wrapper
+
+
+def make_plot_sliders_dashboard(
+    dashboard_parameters: box.Box,
+    values_computing_function: collections.abc.Callable,
+    plotting_function: collections.abc.Callable,
+) -> None:
+    '''
+    Create a dashboard that shows a plot and sliders that can be used
+    to update the plot.
+    This dashboard is seen by entering http://127.0.0.1:8050/
+    in your web browser.
+    The parameters are in a toml file.
+    The starting values of the elements that are used to compute the functions
+    (including the ones in the sliders) are under the [variables]
+    header. These will be update by the sliders.
+    The [display] header contains the size of the plot (its
+    height: The width is the golden ratio times the height) and the title
+    of the dashboard.
+
+    The [sliders] header contains the definition of the sliders:
+    Here is an example (replace the values and 'my_silder')
+    [sliders.my_slider]
+    display_name = 'Midpoint electrity'
+    id = 'midpoint_electricity'
+    minimum =  2025
+    maximum = 2050
+    step = 1
+    start_value = 2035
+    ticks = [2025, 2030, 2035, 2040, 2045, 2050]
+    key = 'mid_year_electric'
+
+    '''
+
+    # We start with getting the plotting values (y-values)
+    plotting_values: list[list[float]] = values_computing_function(
+        dashboard_parameters
+    )
+    # We create a plotly plot/figure (Dash needs this type of plot/figure).
+    display_plot: plotly.graph_objs._figure.Figure = plotting_function(
+        plotting_values, dashboard_parameters
+    )
+
+    # We create a dashboard
+    dashboard: dash.Dash = dash.Dash(__name__)
+
+    # We create a title
+    dashboard_title: dash.html.H1 = dash.html.H1(
+        dashboard_parameters.display.title, style={'textAlign': 'center'}
+    )
+
+    plot_height: float = dashboard_parameters.display.plot_height
+    GOLDEN_RATIO: float = (1 + math.sqrt(5)) / 2
+    plot_width: float = GOLDEN_RATIO * plot_height
+
+    # We create a Div to display the chart
+    demand_plot_display: dash.html.Div = dash.html.Div(
+        children=[
+            dash.html.H2(
+                'Display plot',
+                style={'textAlign': 'center'},
+            ),
+            dash.dcc.Graph(
+                id='Display plot',
+                figure=display_plot,
+                style={
+                    'width': f'{plot_width}vw',
+                    'height': f'{plot_height}vh',
+                },
+            ),
+        ]
+    )
+
+    # We create sliders
+    sliders: list[dash.dcc.Slider | dash.html.H1] = []
+
+    slider_definitions: box.Box = dashboard_parameters.sliders
+    for slider in slider_definitions:
+        slider_marks: dict = {
+            tick: {'label': tick} for tick in slider_definitions[slider].ticks
+        }
+        sliders.append(
+            dash.html.H1(
+                slider_definitions[slider].display_name,
+                style={'textAlign': 'center'},
+            )
+        )
+        sliders.append(
+            dash.dcc.Slider(
+                min=slider_definitions[slider].minimum,
+                max=slider_definitions[slider].maximum,
+                step=slider_definitions[slider].step,
+                id=slider_definitions[slider].id,
+                value=slider_definitions[slider].start_value,
+                marks=slider_marks,
+            )
+        )
+
+    # We put all this in the layout
+    dashboard.layout = dash.html.Div(
+        children=[
+            dashboard_title,
+            demand_plot_display,
+            *sliders,
+            # # Need to unpack to go in children list
+        ]
+    )
+
+    # We create a callback to update the plots if the inputs change
+    # Below the callback , you have a function that does the updates.
+    # The callback first contains the outputs (in the order
+    # they appear in the return statement of the associated function).
+    # Each output has two arguments: its id and its type ('figure', in this
+    # case).
+    # Below the outputs, you have the inputs of the updating function,
+    # in the order they are listed in the function arguments.
+    # Again, these require an is and a type ('value', in this case).
+    # We create the elements of the callback into a list that we convert to
+    # a tuple and unpack into the callback.
+    # We do this (instead of putting the arguments directly into the callabck)
+    # so that we can turn sliders on and off (in the parameters file, by
+    # commenting them out (don't forget to do this both for the slider name
+    # AND its display name)). If the quantity is not in the slider list,
+    # we then can simply use the value eneterd in the parameters file.
+
+    callback_arguments: list[dash.Input | dash.Output] = []
+    # We first add the output (the figure/plot)
+    callback_arguments.append(dash.Output('Display plot', 'figure'))
+
+    # We then list the parameters that are modified
+    modified_parameters: list[str] = []
+
+    # We modify the parameers based on the slider values
+    for slider in slider_definitions:
+        # We add the slider value
+        callback_arguments.append(
+            dash.Input(slider_definitions[slider].id, 'value')
+        )
+        # And we add a key to find the modified parameter
+        modified_parameters.append(slider_definitions[slider].key)
+
+    # We can now perform the update
+    @dashboard.callback(*callback_arguments)
+    def update_plot(*callback_arguments) -> plotly.graph_objs._figure.Figure:
+
+        for argument_index, (updated_value, key) in enumerate(
+            zip(callback_arguments, modified_parameters)
+        ):
+
+            dashboard_parameters.variables[key] = updated_value
+
+        # We remake the plot
+        # We recomput the plotting values (y-values)
+        plotting_values: list[list[float]] = values_computing_function(
+            dashboard_parameters
+        )
+        # We create a plotly plot/figure (Dash needs this type of plot/figure).
+        display_plot: plotly.graph_objs._figure.Figure = plotting_function(
+            plotting_values, dashboard_parameters
+        )
+        return display_plot
+
+    # We run the server
+    dashboard.run(debug=False)
 
 
 if __name__ == '__main__':
