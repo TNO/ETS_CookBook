@@ -1665,23 +1665,24 @@ def make_sankey(
     links: pd.DataFrame,
     sankey_title: str,
     output_folder: str,
-    parameters: dict,
+    Sankey_parameters: box.Box,
+    color_definitions: box.Box,
 ) -> None:
     '''
     Makes a Sankey plot in plotly (comes out as an html file).
     The nodes and links are in a DataFrame
     '''
 
-    node_parameters: dict = parameters['Sankey']['nodes']
+    node_parameters: box.Box = Sankey_parameters.nodes
 
-    label_padding: int = node_parameters['label_padding']
-    label_alignement: str = node_parameters['label_alignement']
+    label_padding: int = node_parameters.label_padding
+    label_alignement: str = node_parameters.label_alignement
 
-    node_labels_names_only: list[str] = pd.Series(nodes['Label']).to_list()
-    display_values: bool = node_parameters['display_values']
+    node_labels_names_only: list[str] = pd.Series(nodes.Label).to_list()
+    display_values: bool = node_parameters.display_values
     if display_values:
-        values_to_add: pd.Series[float] = nodes['Value']
-        unit: str = node_parameters['unit']
+        values_to_add: pd.Series[float] = nodes.Value
+        unit: str = node_parameters.unit
         node_labels: list[str] = []
         for node_label, value_to_add in zip(
             node_labels_names_only, values_to_add
@@ -1692,42 +1693,41 @@ def make_sankey(
 
     node_x_positions: pd.Series[float] = nodes['X position']
     node_y_positions: pd.Series[float] = nodes['Y position']
-    node_colors: pd.Series[str] = nodes['Color']
+    node_colors: pd.Series[str] = nodes.Color
     node_color_dict: dict[str, str] = dict(
         zip(node_labels_names_only, node_colors)
     )
-    color_names: dict[str, list[int]] = parameters['colors']
 
     node_colors_rgba_codes: list[str] = []
     for node_color in node_colors:
         color_opacity: float = 1
-        color_rgb: tuple[int, ...] = tuple(color_names[node_color])
+        color_rgb: tuple[int, ...] = tuple(color_definitions[node_color])
         node_colors_rgba_codes.append(
             rgba_code_color(color_rgb, color_opacity)
         )
 
-    link_parameters: dict[str, ty.Any] = parameters['Sankey']['links']
+    link_parameters: box.Box = Sankey_parameters.links
 
-    link_sources: pd.Series = links['Source']
+    link_sources: pd.Series = links.Source
     link_source_indices: list[int] = [
         node_labels_names_only[node_labels_names_only == source].index[0]
         for source in link_sources
     ]
 
-    link_targets: pd.Series = links['Target']
+    link_targets: pd.Series = links.Target
     link_target_indices: list[int] = [
         node_labels_names_only[node_labels_names_only == target].index[0]
         for target in link_targets
     ]
-    value_scaling_factor: float = link_parameters['value_scaling_factor']
-    link_values_unscaled: pd.Series = links['Value']
+    value_scaling_factor: float = link_parameters.value_scaling_factor
+    link_values_unscaled: pd.Series = links.Value
     link_values: list[float] = [
         link_value / value_scaling_factor
         for link_value in link_values_unscaled
     ]
-    link_colors: pd.Series[str] = links['Color']
-    link_opacities: pd.Series[float] = links['Opacity']
-    link_labels: pd.Series[str] = links['Label']
+    link_colors: pd.Series[str] = links.Color
+    link_opacities: pd.Series[float] = links.Opacity
+    link_labels: pd.Series[str] = links.Label
     link_colors_rgba_codes: list[str] = []
     for link_color, link_opacity, source, target, link_label in zip(
         link_colors,
@@ -1742,7 +1742,7 @@ def make_sankey(
         elif link_color == 'target':
             link_color = node_color_dict[target]
 
-        color_rgb = tuple(color_names[link_color])
+        color_rgb = tuple(color_definitions[link_color])
         link_colors_rgba_codes.append(rgba_code_color(color_rgb, link_opacity))
 
     sankey_figure: go.Figure = go.Figure(
@@ -1765,7 +1765,7 @@ def make_sankey(
             ),
         )
     )
-    title_size: int = parameters['Sankey']['title_size']
+    title_size: int = Sankey_parameters.title_size
     sankey_figure.update_layout(
         title=dict(
             text=f'{sankey_title}',
