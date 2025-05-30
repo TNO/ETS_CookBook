@@ -363,24 +363,20 @@ def save_figure(
     figure: matplotlib.figure.Figure,
     figure_name: str,
     output_folder: str,
-    parameters: dict,
+    dpi_to_use: int,
+    file_formats: box.Box,
 ) -> None:
     '''
     This function saves a Matplolib figure to a number of
-    file formats and an output folder that are all specified in a
-    TOML parameters file (under a [files.figures_outputs] heading).
+    file formats and an output folder.
     '''
 
     check_if_folder_exists(output_folder)
-    file_parameters: dict = parameters['files']
-    figure_parameters: dict = file_parameters['figures']
-    dpi_to_use: int = figure_parameters['dpi']
-    outputs: dict[str, bool] = figure_parameters['outputs']
 
-    for file_type in outputs:
-        if outputs[file_type]:
+    for file_format in file_formats:
+        if file_formats[file_format]:
             figure.savefig(
-                f'{output_folder}/{figure_name}.{file_type}', dpi=dpi_to_use
+                f'{output_folder}/{figure_name}.{file_format}', dpi=dpi_to_use
             )
 
 
