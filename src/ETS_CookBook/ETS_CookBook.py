@@ -868,15 +868,16 @@ def get_map_borders(
     return border_data
 
 
-def get_map_points(NUTS_level: int, parameters: dict) -> gpd.GeoDataFrame:
+def get_map_points(
+    NUTS_level: int, map_parameters: box.Box
+) -> gpd.GeoDataFrame:
     '''
     This function gets the points/labels of regions at a specified NUTS
     level.
     '''
-    maps_parameters: dict[str, ty.Any] = parameters['maps']
-    map_data_folder: str = maps_parameters['map_data_folder']
-    points_data_file_prefix: str = maps_parameters['points_data_file_prefix']
-    points_data_file_suffix: str = maps_parameters['points_data_file_suffix']
+    map_data_folder: str = map_parameters.map_data_folder
+    points_data_file_prefix: str = map_parameters.points_data_file_prefix
+    points_data_file_suffix: str = map_parameters.points_data_file_suffix
 
     points_data_file: str = (
         f'{points_data_file_prefix}{NUTS_level}{points_data_file_suffix}'
