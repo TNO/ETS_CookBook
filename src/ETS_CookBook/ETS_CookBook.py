@@ -192,14 +192,16 @@ def get_extra_colors(color_definitions: box.Box) -> pd.DataFrame:
     return extra_colors
 
 
-def get_rgb_from_name(color_name: str, parameters: dict) -> list[float]:
+def get_rgb_from_name(
+    color_name: str, color_definitions: box.Box
+) -> list[float]:
     '''
     This function takes a color name and returns its RGB values (0 to 1).
     If the color name is in the extra colors, then, we use
     the values given.
     If it is a matplotlib color, then we use the matplotlib function.
     '''
-    extra_colors: pd.DataFrame = get_extra_colors(parameters)
+    extra_colors: pd.DataFrame = get_extra_colors(color_definitions)
 
     if color_name in extra_colors.index.values:
         return list(extra_colors.loc[color_name].values)
