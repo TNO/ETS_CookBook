@@ -210,13 +210,14 @@ def get_rgb_from_name(
 
 
 def rgb_color_list(
-    color_names: list[str], parameters: dict
+    color_names: list[str], color_definitions: box.Box
 ) -> list[list[float]]:
     '''
     Gets a list of RGB codes for a list of color names.
     '''
     rgb_codes: list[list[float]] = [
-        get_rgb_from_name(color_name, parameters) for color_name in color_names
+        get_rgb_from_name(color_name, color_definitions)
+        for color_name in color_names
     ]
 
     return rgb_codes
