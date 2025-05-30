@@ -14,6 +14,7 @@ import time
 import typing as ty
 import zipfile
 
+import box
 import docx
 import docx.document
 import geopandas as gpd
@@ -52,14 +53,14 @@ def check_if_folder_exists(folder_to_check: str) -> None:
         os.makedirs(folder_to_check)
 
 
-def parameters_from_TOML(parameters_file_name: str) -> dict[str, ty.Any]:
+def parameters_from_TOML(parameters_file_name: str) -> box.Box:
     '''
-    Reads a TOML parameters file name and returns a parameters
+    Reads a TOML parameters file name and returns a parameters Box
     dictionary.
     '''
 
     with open(parameters_file_name, mode='rb') as parameters_file:
-        parameters: dict[str, ty.Any] = tomllib.load(parameters_file)
+        parameters: box.Box = box.Box(tomllib.load(parameters_file))
 
     return parameters
 
