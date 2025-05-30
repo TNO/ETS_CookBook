@@ -817,19 +817,18 @@ def string_to_float(my_string: str) -> float:
     return my_output
 
 
-def get_map_area_data(parameters: dict) -> gpd.GeoDataFrame:
+def get_map_area_data(map_parameters: box.Box) -> gpd.GeoDataFrame:
     '''
     This function gets and processes the area data and sets it
     into a DataFrame. It contains polygons/multipolygons
     (they are at a given granularity level, but also have references to higher
     levels).
     '''
-    maps_parameters: dict[str, ty.Any] = parameters['maps']
-    map_data_folder: str = maps_parameters['map_data_folder']
+    map_data_folder: str = map_parameters.map_data_folder
     # This file contains data at NUTS level 3. The reason for this is so that
     # we can remove the outer regions (such as Svalbard or French overseas
     # territories).
-    area_data_file_name: str = maps_parameters['area_data_file_name']
+    area_data_file_name: str = map_parameters.area_data_file_name
 
     area_data: gpd.GeoDataFrame = gpd.read_file(
         f'{map_data_folder}/{area_data_file_name}'
@@ -838,9 +837,7 @@ def get_map_area_data(parameters: dict) -> gpd.GeoDataFrame:
     # This is the list of regions to remove from the map.
     # These are the outer regions (such as Svalbard or French overseas
     # territories).
-    general_exclusion_codes: list[str] = maps_parameters[
-        'general_exclusion_codes'
-    ]
+    general_exclusion_codes: list[str] = map_parameters.general_exclusion_codes
 
     # This removes the excluded areas. The ~ flips the boolean values
     # so that we keep the areas that are not in the exclusion list.
