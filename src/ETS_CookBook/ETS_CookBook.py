@@ -1346,14 +1346,16 @@ def clear_word_document(document_file_name: str) -> None:
     target_document.save(document_file_name)
 
 
-def get_rgb_255_code_string(color_name: str, parameters: dict) -> str:
+def get_rgb_255_code_string(
+    color_name: str, color_definitions: box.Box
+) -> str:
     '''
     Creates a string with rgb values (0-255),
     rgb(111, 233, 66)
     This is used for plotly.
     '''
     # We get the RGB (0-1) from the color name
-    rgb_1: list[float] = get_rgb_from_name(color_name, parameters)
+    rgb_1: list[float] = get_rgb_from_name(color_name, color_definitions)
     # We convert this to a 0-255 rgb list
     rgb_255: list[int] = [int(255 * rgb_value) for rgb_value in rgb_1]
 
@@ -1365,7 +1367,7 @@ def get_rgb_255_code_string(color_name: str, parameters: dict) -> str:
 
 
 def get_rgba_255_code_string(
-    color_name: str, opacity: float, parameters: dict
+    color_name: str, opacity: float, color_definitions: box.Box
 ) -> str:
     '''
     Creates a string with rgba values (0-255),
@@ -1373,7 +1375,7 @@ def get_rgba_255_code_string(
     This is used for plotly.
     '''
     # We get the RGB (0-1) from the color name
-    rgb_1: list[float] = get_rgb_from_name(color_name, parameters)
+    rgb_1: list[float] = get_rgb_from_name(color_name, color_definitions)
     # We convert this to a 0-255 rgb list
     rgba_255: list[int | float] = [int(255 * rgb_value) for rgb_value in rgb_1]
     # We add the opacity:
