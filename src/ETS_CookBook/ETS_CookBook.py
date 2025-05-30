@@ -385,12 +385,11 @@ def save_dataframe(
     dataframe_name: str,
     groupfile_name: str,
     output_folder: str,
-    parameters: dict,
+    dataframe_formats: box.Box,
 ) -> None:
     '''
     This function saves a pandas dataframe to a number of
-    file formats and an output folder that are all specified in a
-    TOML parameters file (under a [files.dataframe_outputs] heading).
+    file formats and an output folder.
 
     Note that for some file types, you might need to install additional
     libraries.
@@ -417,8 +416,6 @@ def save_dataframe(
     '''
 
     check_if_folder_exists(output_folder)
-    file_parameters: dict = parameters['files']
-    dataframe_outputs: dict[str, bool] = file_parameters['dataframe_outputs']
 
     file_types: list[str] = [
         'csv',
@@ -546,7 +543,7 @@ def save_dataframe(
             file_functions.append(getattr(dataframe_to_use, function_name))
 
     using_file_types: list[bool] = [
-        dataframe_outputs[file_type] for file_type in file_types
+        dataframe_formats[file_type] for file_type in file_types
     ]
 
     for (
