@@ -5,7 +5,7 @@ They are listed in the following documentation:
 https://tno.github.io/ETS_CookBook/
 '''
 
-import collections
+import collections.abc
 import datetime
 import functools
 import math
@@ -20,6 +20,9 @@ import box
 import dash
 import docx
 import docx.document
+import docx.oxml.ns
+import docx.shared
+import docx.table
 import geopandas as gpd
 import matplotlib
 import matplotlib.axes
@@ -37,6 +40,8 @@ import plotly
 import plotly.graph_objects as go
 import requests
 import xarray as xr
+from docx.table import Table as docx_Table
+from rich import print
 
 
 def check_if_folder_exists(folder_to_check: str) -> None:
@@ -122,33 +127,39 @@ def dataframe_from_Excel_table_name(
         Excel_file, data_only=load_data_only
     )
 
+    table_found: bool = False
+    table_dataframe: pd.DataFrame = pd.DataFrame()
     # We need to look up the worksheet
-    # table_worksheet = ''
     for worksheet in source_workbook.worksheets:
         if table_name in worksheet.tables:
             table_worksheet = worksheet
 
-    table: openpyxl.worksheet.table.Table = table_worksheet.tables[table_name]
-    table_range: tuple = table_worksheet[table.ref]
+            table: openpyxl.worksheet.table.Table = table_worksheet.tables[
+                table_name
+            ]
+            table_range: tuple = table_worksheet[table.ref]
 
-    table_entries: list[list] = [
-        [cell_entry.value for cell_entry in row_entry]
-        for row_entry in table_range
-    ]
+            table_entries: list[list] = [
+                [cell_entry.value for cell_entry in row_entry]
+                for row_entry in table_range
+            ]
 
-    table_headers: list[str] = table_entries[0]
-    table_values: list[ty.Any] = table_entries[1:]
+            table_headers: list[str] = table_entries[0]
+            table_values: list[ty.Any] = table_entries[1:]
 
-    # We need to go thhrough a dictionary, as passing the values directly
-    # leads to duplicates with no index, for some reason
-    table_dictionary: dict[str, ty.Any] = {}
-    for header_index, header in enumerate(table_headers):
-        values_for_header: list[ty.Any] = [
-            table_row[header_index] for table_row in table_values
-        ]
-        table_dictionary[header] = values_for_header
+            # We need to go thhrough a dictionary, as passing the values
+            # directly leads to duplicates with no index, for some reason
+            table_dictionary: dict[str, ty.Any] = {}
+            for header_index, header in enumerate(table_headers):
+                values_for_header: list[ty.Any] = [
+                    table_row[header_index] for table_row in table_values
+                ]
+                table_dictionary[header] = values_for_header
 
-    table_dataframe: pd.DataFrame = pd.DataFrame.from_dict(table_dictionary)
+            table_dataframe = pd.DataFrame.from_dict(table_dictionary)
+            table_found = True
+    if not table_found:
+        print(f'{table_name} was not found, returning an empty DataFrame')
 
     return table_dataframe
 
@@ -300,7 +311,7 @@ def register_color_bars(
             )
         )
 
-        if color_bar_to_register.name not in matplotlib.pyplot.colormaps():
+        if color_bar_to_register.name not in plt.colormaps():
             matplotlib.colormaps.register(color_bar_to_register)
 
 
@@ -352,9 +363,10 @@ def get_season(time_stamp: datetime.datetime) -> str:
             ),
         ),
     ]
+    result_season: str = ''
     for season, (start, end) in seasons:
         if start <= date <= end:
-            result_season: str = season
+            result_season = season
     return result_season
 
 
@@ -840,7 +852,9 @@ def get_map_area_data(map_parameters: box.Box) -> gpd.GeoDataFrame:
 
     # This removes the excluded areas. The ~ flips the boolean values
     # so that we keep the areas that are not in the exclusion list.
-    area_data = area_data[~area_data['NUTS_ID'].isin(general_exclusion_codes)]
+    area_data = gpd.GeoDataFrame(
+        area_data[~area_data['NUTS_ID'].isin(general_exclusion_codes)]
+    )
 
     return area_data
 
@@ -1184,7 +1198,7 @@ def put_dataframe_in_word_document(
 
     # With these, we know how big our table has to be.
     # We create a table in the document
-    table_in_document: docx.document.Table = target_document.add_table(
+    table_in_document: docx_Table = target_document.add_table(
         rows=dataframe_to_put.shape[0] + column_index_depth,
         cols=dataframe_to_put.shape[1] + row_index_depth,
         style=table_style,
@@ -1225,41 +1239,44 @@ def put_dataframe_in_word_document(
             )  # We need a string to put in the table
             current_cell.paragraphs[0].runs[0].font.size = headers_font_size
 
-    # We put the index/row headers in
-    for row_index, row_header in enumerate(dataframe_to_put.index):
-        # If there are several levels, we need to go through them
-        if row_index_depth > 1:
-            for row_entry_index, row_entry in enumerate(row_header):
+        # We put the index/row headers in
+        for row_index, row_header in enumerate(dataframe_to_put.index):
+            # If there are several levels, we need to go through them
+            if row_index_depth > 1:
+                for row_entry_index, row_entry in enumerate(row_header):
+                    current_cell = table_in_document.cell(
+                        row_index + column_index_depth, row_entry_index
+                    )
+                    current_cell.text = str(
+                        row_entry
+                    )  # We need a string to put in the table
+                    current_cell.paragraphs[0].runs[
+                        0
+                    ].font.size = headers_font_size
+                    if merge_headers:
+                        if column_index > 0:
+                            previous_cell = table_in_document.cell(
+                                row_index + column_index_depth - 1,
+                                row_entry_index,
+                            )
+                            if str(row_entry) == previous_cell.text:
+                                previous_cell.merge(current_cell)
+                                previous_cell.text = str(row_entry)
+                                make_cell_text_vertical(
+                                    previous_cell, bottom_to_top
+                                )
+
+            # Otherwise, we just put the entries
+            else:
                 current_cell = table_in_document.cell(
-                    row_index + column_index_depth, row_entry_index
+                    row_index + column_index_depth, 0
                 )
                 current_cell.text = str(
-                    row_entry
+                    row_header
                 )  # We need a string to put in the table
                 current_cell.paragraphs[0].runs[
                     0
                 ].font.size = headers_font_size
-                if merge_headers:
-                    if column_index > 0:
-                        previous_cell = table_in_document.cell(
-                            row_index + column_index_depth - 1, row_entry_index
-                        )
-                        if str(row_entry) == previous_cell.text:
-                            previous_cell.merge(current_cell)
-                            previous_cell.text = str(row_entry)
-                            make_cell_text_vertical(
-                                previous_cell, bottom_to_top
-                            )
-
-        # Otherwise, we just put the entries
-        else:
-            current_cell = table_in_document.cell(
-                row_index + column_index_depth, 0
-            )
-            current_cell.text = str(
-                row_header
-            )  # We need a string to put in the table
-            current_cell.paragraphs[0].runs[0].font.size = headers_font_size
 
     # We now put the values in
     for row_index, (row_header, row_values) in enumerate(
