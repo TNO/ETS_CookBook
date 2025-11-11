@@ -529,13 +529,13 @@ def save_dataframe(
                 # has a name. This causes issues if we try to replace
                 # things if the index does not have a name
                 dataframe_to_use.index.name = (
-                    dataframe_to_use.index.name.replace(' ', '_')
+                    str(dataframe_to_use.index.name).replace(' ', '_')
                 )
             elif dataframe_to_use.index.names:
                 # MultiIndex has to be treated sepaartely
                 if dataframe_to_use.index.names[0] is not None:
                     dataframe_to_use.index.names = [
-                        old_name.replace(' ', '_')
+                        str(old_name).replace(' ', '_')
                         for old_name in dataframe_to_use.index.names
                     ]
 
