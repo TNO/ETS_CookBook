@@ -602,12 +602,15 @@ def save_dataframe(
                         file_function(file_to_use, sheet_name=dataframe_name)
 
                 elif file_type == 'sql':
-                    with sqlite3.connect(file_to_use) as sql_connection:
-                        file_function(
-                            dataframe_name,
-                            con=sql_connection,
-                            if_exists='replace',
-                        )
+                    sql_connection: sqlite3.Connection = sqlite3.connect(
+                        file_to_use
+                    )
+                    file_function(
+                        dataframe_name,
+                        con=sql_connection,
+                        if_exists='replace',
+                    )
+                    sql_connection.close()
 
             else:
                 file_to_use = (
@@ -638,27 +641,30 @@ def put_dataframe_in_sql_in_chunks(
     chunk_start: int = 0
     chunk_end: int = 0
 
-    with sqlite3.connect(sql_file) as sql_connection:
-        if drop_existing_table:
-            table_action: ty.Literal['fail', 'replace', 'append'] = 'replace'
-        else:
-            table_action = 'append'
+    sql_connection: sqlite3.Connection = sqlite3.connect(sql_file)
 
-        while chunk_end < data_length:
-            chunk_end = min(chunk_start + chunk_size, data_length)
-            # We select the corresponding chunk in the dataframe and
-            # write it to the SQL database
-            dataframe_chunk: pd.DataFrame = source_dataframe.iloc[
-                chunk_start:chunk_end
-            ]
+    if drop_existing_table:
+        table_action: ty.Literal['fail', 'replace', 'append'] = 'replace'
+    else:
+        table_action = 'append'
 
-            dataframe_chunk.to_sql(
-                table_name, con=sql_connection, if_exists=table_action
-            )
+    while chunk_end < data_length:
+        chunk_end = min(chunk_start + chunk_size, data_length)
+        # We select the corresponding chunk in the dataframe and
+        # write it to the SQL database
+        dataframe_chunk: pd.DataFrame = source_dataframe.iloc[
+            chunk_start:chunk_end
+        ]
 
-            chunk_start = chunk_end + 1
-            # Subsequent additions append in all cases
-            table_action = 'append'
+        dataframe_chunk.to_sql(
+            table_name, con=sql_connection, if_exists=table_action
+        )
+
+        chunk_start = chunk_end + 1
+        # Subsequent additions append in all cases
+        table_action = 'append'
+
+    sql_connection.close()
 
 
 def query_list_from_file(sql_file: str) -> list[str]:
@@ -1123,12 +1129,13 @@ def read_table_from_database(
     Reads a table from an sqlite3 database and returns it as a
     dataframe
     '''
-    with sqlite3.connect(database_file) as sql_connection:
-        table_query: str = read_query_generator(
-            '*', f'"{table_name}"', [], [], []
-        )
+    sql_connection: sqlite3.Connection = sqlite3.connect(database_file)
+    table_query: str = read_query_generator(
+        '*', f'"{table_name}"', [], [], []
+    )
 
-        table_to_read: pd.DataFrame = pd.read_sql(table_query, sql_connection)
+    table_to_read: pd.DataFrame = pd.read_sql(table_query, sql_connection)
+    sql_connection.close()
 
     return table_to_read
 
