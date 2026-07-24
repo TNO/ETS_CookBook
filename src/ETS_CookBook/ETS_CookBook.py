@@ -204,7 +204,7 @@ def get_extra_colors(color_definitions: box.Box) -> pd.DataFrame:
 
 def get_rgb_from_name(
     color_name: str, color_definitions: box.Box
-) -> list[float]:
+) -> tuple[float, float, float]:
     '''
     This function takes a color name and returns its RGB values (0 to 1).
     If the color name is in the extra colors, then, we use
@@ -214,18 +214,18 @@ def get_rgb_from_name(
     extra_colors: pd.DataFrame = get_extra_colors(color_definitions)
 
     if color_name in extra_colors.index.values:
-        return list(extra_colors.loc[color_name].values)
+        return tuple(extra_colors.loc[color_name].values)
     else:
-        return list(matplotlib.colors.to_rgb(color_name))
+        return matplotlib.colors.to_rgb(color_name)
 
 
 def rgb_color_list(
     color_names: list[str], color_definitions: box.Box
-) -> list[list[float]]:
+) -> list[tuple[float, float, float]]:
     '''
     Gets a list of RGB codes for a list of color names.
     '''
-    rgb_codes: list[list[float]] = [
+    rgb_codes: list[tuple[float, float, float]] = [
         get_rgb_from_name(color_name, color_definitions)
         for color_name in color_names
     ]
