@@ -42,6 +42,7 @@ import requests
 import xarray as xr
 from docx.table import Table as docx_Table
 from rich import print
+from pathlib import Path
 
 
 def check_if_folder_exists(folder_to_check: str) -> None:
@@ -57,7 +58,7 @@ def check_if_folder_exists(folder_to_check: str) -> None:
         os.makedirs(folder_to_check)
 
 
-def parameters_from_TOML(parameters_file_name: str) -> box.Box:
+def parameters_from_TOML(parameters_file_name: str | Path) -> box.Box:
     '''
     Reads a TOML parameters file name and returns a parameters Box.
     '''
@@ -1378,7 +1379,7 @@ def get_rgb_255_code_string(
     This is used for plotly.
     '''
     # We get the RGB (0-1) from the color name
-    rgb_1: list[float] = get_rgb_from_name(color_name, color_definitions)
+    rgb_1: list[float] = list(get_rgb_from_name(color_name, color_definitions))
     # We convert this to a 0-255 rgb list
     rgb_255: list[int] = [int(255 * rgb_value) for rgb_value in rgb_1]
 
@@ -1398,7 +1399,7 @@ def get_rgba_255_code_string(
     This is used for plotly.
     '''
     # We get the RGB (0-1) from the color name
-    rgb_1: list[float] = get_rgb_from_name(color_name, color_definitions)
+    rgb_1: list[float] = list(get_rgb_from_name(color_name, color_definitions))
     # We convert this to a 0-255 rgb list
     rgba_255: list[int | float] = [int(255 * rgb_value) for rgb_value in rgb_1]
     # We add the opacity:
@@ -1424,7 +1425,7 @@ def make_quantity_map(
     Makes one of the quantity maps in a map grid.
     '''
     # We get some display parameters
-    no_data_color: list[float] = get_rgb_from_name(
+    no_data_color: tuple[float, float, float] = get_rgb_from_name(
         map_grid_plot_parameters.no_data_color, color_definitions
     )
     heat_bar_map: str = quantity_color
